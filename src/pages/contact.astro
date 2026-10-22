@@ -1,30 +1,156 @@
 ---
+import type { ImageMetadata } from 'astro';
+import { Image } from 'astro:assets';
 import Base from '../layouts/Base.astro';
+import { sphere, VIEWBOX } from '../lib/forms';
+
 const email = 'zinnia_art@proton.me';
+const topics = ['Feedback', 'Bug report', 'Feature idea', 'Collaboration'];
+const mailto = (topic: string) => `mailto:${email}?subject=${encodeURIComponent(`Loop Master — ${topic}`)}`;
+
+// Optional art: drop contact-art.jpg into src/assets/img and it replaces the sphere.
+const art = import.meta.glob<{ default: ImageMetadata }>('../assets/img/contact-art.{jpg,jpeg,png,webp}', { eager: true });
+const contactArt = Object.values(art)[0]?.default;
+const s = sphere();
 ---
 
 <Base title="Contact" description="Questions, feedback or suggestions for Loop Master.">
   <section class="page wrap contact">
-    <p class="label">Get in touch</p>
-    <h1 class="title">Contact Us</h1>
-    <p class="lede">Have questions, feedback, or suggestions? We'd love to hear from you! Contact us at:</p>
-    <a class="email" href={`mailto:${email}`}>{email}</a>
+    <div class="copy">
+      <p class="label">Get in touch</p>
+      <h1>Contact <span class="outline">Us</span></h1>
+      <p class="lede">Have questions, feedback, or suggestions? We'd love to hear from you! Contact us at:</p>
+
+      <div class="email-row">
+        <a class="email" href={`mailto:${email}`}>{email}</a>
+        <button class="btn btn--ghost copy-btn" type="button" data-copy={email}>Copy</button>
+      </div>
+
+      <p class="label topics-label">Or start with a topic</p>
+      <ul class="topics">
+        {topics.map((t) => <li><a class="chip" href={mailto(t)}>{t}</a></li>)}
+      </ul>
+
+      <p class="label itch">
+        Prefer itch.io? <a href="https://zinnia-art.itch.io/loop-master" rel="noopener">Find Loop Master there ↗</a>
+      </p>
+    </div>
+
+    <figure class="art" aria-hidden="true">
+      {contactArt ? (
+        <Image src={contactArt} alt="" widths={[480, 800, 1200]} sizes="(max-width: 860px) 100vw, 45vw" loading="eager" />
+      ) : (
+        <svg viewBox={VIEWBOX}>
+          <g class="shape">{s.shape.map((d) => <path d={d} />)}</g>
+          {s.loops.map((l, i) => (
+            <g class="loop" style={`--d:${i * 0.35}s`}>
+              {l.hid.map((d) => <path class="hid" d={d} />)}
+              {l.vis.map((d) => <path class="vis" d={d} pathLength="1" />)}
+            </g>
+          ))}
+        </svg>
+      )}
+    </figure>
   </section>
   <div class="section"></div>
 </Base>
 
+<script>
+  document.querySelectorAll<HTMLButtonElement>('[data-copy]').forEach((btn) => {
+    btn.addEventListener('click', async () => {
+      const text = btn.dataset.copy ?? '';
+      try {
+        await navigator.clipboard.writeText(text);
+      } catch {
+        // Older browsers / insecure contexts: select the address so the user can copy it.
+        const a = btn.previousElementSibling;
+        if (a) window.getSelection()?.selectAllChildren(a);
+        return;
+      }
+      btn.textContent = 'Copied ✓';
+      btn.classList.add('is-done');
+      setTimeout(() => {
+        btn.textContent = 'Copy';
+        btn.classList.remove('is-done');
+      }, 2000);
+    });
+  });
+</script>
+
 <style>
-  .title { font-size: clamp(2.5rem, 7vw, 5rem); }
-  .lede { font-size: var(--step-1); }
+  .contact {
+    display: grid;
+    grid-template-columns: minmax(0, 6fr) minmax(0, 5fr);
+    gap: clamp(32px, 6vw, 96px);
+    align-items: center;
+  }
+  @media (max-width: 860px) { .contact { grid-template-columns: minmax(0, 1fr); } }
+
+  h1 { font-size: clamp(2.75rem, 8vw, 6.5rem); }
+  .lede { font-size: var(--step-1); color: var(--muted); }
+
+  .email-row { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 20px; margin: 8px 0 40px; }
   .email {
-    display: inline-block;
-    margin-top: 8px;
     font-family: var(--font-mono);
-    font-size: clamp(1.125rem, 3.5vw, 1.75rem);
+    font-size: clamp(1.125rem, 3vw, 1.75rem);
     color: var(--accent);
     text-decoration: none;
     border-bottom: 1px solid var(--accent);
     word-break: break-all;
   }
   .email:hover { color: var(--line); border-color: var(--line); }
+  .copy-btn { padding: 0.55em 1em; font-size: 0.75rem; }
+  .copy-btn.is-done { color: var(--accent); border-color: var(--accent); }
+
+  .topics-label { margin-bottom: 12px; }
+  .topics { list-style: none; margin: 0 0 40px; padding: 0; display: flex; flex-wrap: wrap; gap: 10px; }
+  .chip {
+    display: inline-block;
+    padding: 0.55em 1.1em;
+    border: 1px solid var(--line-dim);
+    border-radius: 999px;
+    font-size: 0.9375rem;
+    color: var(--line);
+    text-decoration: none;
+    transition: border-color 0.15s, color 0.15s, background 0.15s;
+  }
+  .chip:hover { border-color: var(--accent); color: var(--ink); background: var(--accent); }
+  .itch a { color: var(--line); }
+
+  .art { margin: 0; }
+  .art :global(img) {
+    width: 100%;
+    border-radius: var(--radius);
+    -webkit-mask-image: radial-gradient(ellipse 70% 70% at 50% 50%, #000 55%, transparent 100%);
+    mask-image: radial-gradient(ellipse 70% 70% at 50% 50%, #000 55%, transparent 100%);
+  }
+  .art svg {
+    width: 100%;
+    max-width: 460px;
+    display: block;
+    margin-inline: auto;
+    overflow: visible;
+    background: radial-gradient(circle, rgb(255 153 51 / 0.12) 0%, transparent 62%);
+    border-radius: 50%;
+  }
+  svg path { fill: none; stroke-linecap: round; stroke-linejoin: round; }
+  .shape path { stroke: var(--line); stroke-width: 1.2; }
+  .loop .vis {
+    stroke: var(--accent);
+    stroke-width: 1.6;
+    stroke-dasharray: 1;
+    stroke-dashoffset: 1;
+    animation: lm-draw 7s cubic-bezier(0.6, 0, 0.3, 1) var(--d) infinite both;
+  }
+  .loop .hid {
+    stroke: var(--accent);
+    stroke-width: 1.1;
+    stroke-dasharray: 3 5;
+    opacity: 0;
+    animation: lm-hidden 7s ease var(--d) infinite both;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .loop .vis { animation: none; stroke-dashoffset: 0; }
+    .loop .hid { animation: none; opacity: 0.55; }
+  }
 </style>

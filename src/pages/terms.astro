@@ -1,21 +1,47 @@
 ---
 import Base from '../layouts/Base.astro';
 const email = 'zinnia_art@proton.me';
+const updated = 'October 22, 2026';
+const toc = [
+  { id: 'who', label: 'Who we are' },
+  { id: 'terms', label: 'Terms and Conditions' },
+  { id: 'privacy', label: 'Privacy Policy' },
+  { id: 'contact', label: 'Contact Us' },
+];
 ---
 
 <Base title="Terms and Privacy Policy" description="Loop Master terms of use and privacy policy.">
-  <section class="page wrap">
-    <div class="prose">
+  <section class="page wrap legal">
+    <header class="legal-head">
       <p class="label">Legal</p>
-      <h1 class="title">Terms and Privacy Policy</h1>
+      <h1>Terms and Privacy Policy</h1>
+      <p class="label updated">Last updated: {updated}</p>
+    </header>
 
-      <h2>Who we are</h2>
+    <aside class="toc" aria-label="On this page">
+      <p class="label">On this page</p>
+      <ol>
+        {toc.map((t) => <li><a href={`#${t.id}`} data-toc={t.id}>{t.label}</a></li>)}
+      </ol>
+    </aside>
+
+    <div class="prose">
+      <div class="in-short" role="note">
+        <p class="label">In short</p>
+        <ul>
+          <li>Loop Master is free.</li>
+          <li>No sign-in, no account.</li>
+          <li>No personal data required.</li>
+        </ul>
+      </div>
+
+      <h2 id="who">Who we are</h2>
       <p>
         Loop Master is a free online tool designed to help you practice drawing loops and cross contour lines on
         various shapes. No sign-in or personal information is required to start creating!
       </p>
 
-      <h2>Terms and Conditions</h2>
+      <h2 id="terms">Terms and Conditions</h2>
       <p>By using Loop Master, you agree to the following terms:</p>
       <ul>
         <li><strong>Use of the Tool:</strong> Loop Master is for personal use only. You may not use it for commercial purposes.</li>
@@ -25,17 +51,17 @@ const email = 'zinnia_art@proton.me';
         <li><strong>Modifications:</strong> We may update these terms at any time. Changes will be posted on this page.</li>
       </ul>
 
-      <h2>Privacy Policy</h2>
+      <h2 id="privacy">Privacy Policy</h2>
       <p>Loop Master is committed to protecting your privacy. Here’s how we handle your data:</p>
       <ul>
         <li><strong>No Personal Data Collection:</strong> We do not require any personal information to use Loop Master. No sign-in is needed.</li>
-        <li><strong>Cookies:</strong> We may use cookies to enhance your experience. You can choose to accept or decline cookies through your browser settings.</li>
-        <li><strong>Data Usage:</strong> Any data collected (e.g., usage statistics) is anonymized and used solely to improve Loop Master.</li>
+        <li><strong>Cookies:</strong> This website does not use cookies. The practice tool may save your session settings in your browser’s local storage; that data stays on your device.</li>
+        <li><strong>Data Usage:</strong> We do not currently collect usage statistics. If we ever add anonymous analytics, we will update this page first.</li>
         <li><strong>Third-Party Services:</strong> Loop Master does not share your data with third-party services without your explicit consent.</li>
         <li><strong>Changes to Privacy Policy:</strong> We may update our privacy policy. Any changes will be reflected on this page.</li>
       </ul>
 
-      <h2>Contact Us</h2>
+      <h2 id="contact">Contact Us</h2>
       <p>
         If you have questions about our terms and privacy policy, please reach out to us at
         <a href={`mailto:${email}`}>{email}</a>.
@@ -46,6 +72,66 @@ const email = 'zinnia_art@proton.me';
   <div class="section"></div>
 </Base>
 
+<script>
+  // Highlight the section currently being read in the side contents.
+  const links = new Map(
+    [...document.querySelectorAll<HTMLAnchorElement>('[data-toc]')].map((a) => [a.dataset.toc, a]),
+  );
+  const io = new IntersectionObserver(
+    (entries) => {
+      for (const e of entries) {
+        if (!e.isIntersecting) continue;
+        links.forEach((a) => a.removeAttribute('aria-current'));
+        links.get(e.target.id)?.setAttribute('aria-current', 'true');
+      }
+    },
+    { rootMargin: '-20% 0px -70% 0px' },
+  );
+  links.forEach((_, id) => {
+    const el = id && document.getElementById(id);
+    if (el) io.observe(el);
+  });
+</script>
+
 <style>
-  .title { font-size: clamp(2.25rem, 6vw, 4rem); }
+  .legal {
+    display: grid;
+    grid-template-columns: minmax(180px, 220px) minmax(0, 1fr);
+    column-gap: clamp(32px, 6vw, 96px);
+  }
+  .legal-head { grid-column: 1 / -1; margin-bottom: 40px; }
+  h1 { font-size: clamp(2.25rem, 6vw, 4rem); margin-bottom: 0.2em; }
+  .updated { color: var(--accent); }
+
+  .toc { position: sticky; top: 32px; align-self: start; }
+  .toc ol { list-style: none; margin: 12px 0 0; padding: 0; border-left: 1px solid var(--line-dim); }
+  .toc a {
+    display: block;
+    padding: 6px 0 6px 14px;
+    margin-left: -1px;
+    border-left: 2px solid transparent;
+    color: var(--muted);
+    text-decoration: none;
+    font-size: 0.9375rem;
+  }
+  .toc a:hover { color: var(--line); }
+  .toc a[aria-current] { color: var(--accent); border-left-color: var(--accent); }
+
+  .prose h2 { scroll-margin-top: 32px; }
+  .in-short {
+    padding: 20px 24px;
+    margin-bottom: 8px;
+    background: var(--ink-2);
+    border: 1px solid var(--line-dim);
+    border-left: 3px solid var(--accent);
+    border-radius: var(--radius);
+  }
+  .in-short ul { margin: 8px 0 0; padding: 0; list-style: none; display: flex; flex-wrap: wrap; gap: 8px 28px; }
+  .in-short li { margin: 0; font-size: var(--step-1); color: var(--line); }
+  .in-short li::before { content: '✓'; color: var(--accent); margin-right: 8px; }
+
+  @media (max-width: 860px) {
+    .legal { grid-template-columns: minmax(0, 1fr); }
+    .toc { position: static; margin-bottom: 32px; }
+  }
 </style>

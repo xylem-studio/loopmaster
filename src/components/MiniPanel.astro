@@ -1,0 +1,25 @@
+---
+// A tiny line drawing of the game's session-settings panel, for use inside a 200×200 SVG.
+---
+
+<g class="mini-panel">
+  <rect class="frame" x="38" y="34" width="124" height="132" rx="12" />
+  <text x="54" y="62">IMAGES</text>
+  <rect class="field" x="54" y="70" width="92" height="18" rx="9" />
+  <text class="val" x="100" y="83">9</text>
+  <text x="54" y="108">TIME</text>
+  {[0, 1, 2].map((n) => <circle class:list={['pill', { on: n === 1 }]} cx={64 + n * 36} cy="122" r="7" />)}
+  <text x="54" y="152">FEEDBACK</text>
+  <rect class="field" x="118" y="143" width="28" height="14" rx="7" />
+  <circle class="knob" cx="139" cy="150" r="5" />
+</g>
+
+<style>
+  .frame { fill: none; stroke: var(--ink-line, var(--line)); stroke-width: 1.4; }
+  .field { fill: none; stroke: var(--line-dim); stroke-width: 1.4; }
+  text { fill: var(--muted); font-family: var(--font-mono); font-size: 8px; letter-spacing: 0.08em; }
+  .val { fill: var(--line); text-anchor: middle; font-size: 10px; }
+  .pill { fill: none; stroke: var(--line-dim); stroke-width: 1.4; }
+  .pill.on { fill: var(--accent); stroke: var(--accent); }
+  .knob { fill: var(--accent); }
+</style>

@@ -1,0 +1,45 @@
+---
+// GitHub Pages serves this for any missing URL.
+import Base from '../layouts/Base.astro';
+import { cube, VIEWBOX } from '../lib/forms';
+
+const c = cube();
+---
+
+<Base title="Page not found" description="This page is unseen.">
+  <section class="page wrap lost">
+    <svg viewBox={VIEWBOX} aria-hidden="true">
+      {[...c.shape, ...c.shapeHidden].map((d) => <path class="edge" d={d} />)}
+      {c.loops.flatMap((l) => [...l.vis, ...l.hid]).map((d) => <path class="loop" d={d} />)}
+    </svg>
+    <div>
+      <p class="label">Error 404</p>
+      <h1>This page is <span class="outline">unseen</span></h1>
+      <p class="muted">Whatever was here is hidden behind the form. Let's get you back to something you can draw.</p>
+      <div class="ctas">
+        <a class="btn" href="/">Back home</a>
+        <a class="btn btn--ghost" href="/practice/">Start Practicing</a>
+      </div>
+    </div>
+  </section>
+  <div class="section"></div>
+</Base>
+
+<style>
+  .lost {
+    display: grid;
+    grid-template-columns: minmax(160px, 320px) minmax(0, 1fr);
+    gap: clamp(32px, 6vw, 80px);
+    align-items: center;
+  }
+  @media (max-width: 700px) { .lost { grid-template-columns: minmax(0, 1fr); } .lost svg { max-width: 220px; } }
+  h1 { font-size: clamp(2.5rem, 6.5vw, 5.5rem); }
+  svg { width: 100%; overflow: visible; }
+  /* Everything is a hidden line here. */
+  path { fill: none; stroke-linecap: round; }
+  .edge { stroke: var(--line); stroke-width: 1.4; stroke-dasharray: 5 6; opacity: 0.6; animation: march 4s linear infinite; }
+  .loop { stroke: var(--accent); stroke-width: 1.6; stroke-dasharray: 3 6; animation: march 3s linear infinite reverse; }
+  @keyframes march { to { stroke-dashoffset: -22; } }
+  .ctas { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 24px; }
+  @media (prefers-reduced-motion: reduce) { .edge, .loop { animation: none; } }
+</style>

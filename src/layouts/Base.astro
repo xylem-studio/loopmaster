@@ -66,7 +66,12 @@ const isCurrent = (href: string) => (href === '/' ? path === '/' : path === href
 
     <footer class="site-footer">
       <div class="wrap foot">
+        <div class="foot-brand">
+          <p class="foot-tag">Draw the <span class="outline">Unseen</span></p>
+          <a class="foot-mail" href="mailto:zinnia_art@proton.me">zinnia_art@proton.me</a>
+        </div>
         <nav aria-label="Footer">
+          <p class="label">Site</p>
           <ul>
             <li><a href="/practice/">Practice</a></li>
             <li><a href="/about/">About</a></li>
@@ -74,7 +79,13 @@ const isCurrent = (href: string) => (href === '/' ? path === '/' : path === href
             <li><a href="/terms/">Terms and Privacy Policy</a></li>
           </ul>
         </nav>
-        <p class="label">Copyright © {new Date().getFullYear()} Loop Master</p>
+        <div>
+          <p class="label">Elsewhere</p>
+          <ul>
+            <li><a href="https://zinnia-art.itch.io/loop-master" rel="noopener">Loop Master on itch.io ↗</a></li>
+          </ul>
+        </div>
+        <p class="label copy">Copyright © {new Date().getFullYear()} Loop Master</p>
       </div>
     </footer>
   </body>
@@ -123,16 +134,28 @@ const isCurrent = (href: string) => (href === '/' ? path === '/' : path === href
 
   .site-footer {
     border-top: 1px solid var(--line-dim);
-    padding-block: 40px;
+    padding-block: 56px 32px;
   }
   .foot {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    justify-content: space-between;
-    gap: 16px;
+    display: grid;
+    grid-template-columns: minmax(0, 2fr) minmax(0, 1fr) minmax(0, 1fr);
+    gap: 32px;
   }
+  .foot ul { display: flex; flex-direction: column; gap: 8px; margin: 12px 0 0; padding: 0; list-style: none; }
   .foot a { color: var(--muted); text-decoration: none; font-size: 0.9375rem; }
   .foot a:hover { color: var(--accent); }
   .foot p { margin: 0; }
+  .foot-tag {
+    font-family: var(--font-display);
+    font-size: clamp(1.75rem, 3.5vw, 2.5rem);
+    line-height: 1;
+    text-transform: uppercase;
+    margin-bottom: 14px !important;
+  }
+  .foot .foot-mail { font-family: var(--font-mono); color: var(--accent); }
+  .foot .copy { grid-column: 1 / -1; max-width: none; padding-top: 24px; border-top: 1px solid var(--line-dim); }
+  @media (max-width: 700px) {
+    .foot { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+    .foot-brand { grid-column: 1 / -1; }
+  }
 </style>

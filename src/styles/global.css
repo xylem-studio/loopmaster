@@ -131,3 +131,37 @@ a:hover { color: var(--accent); }
 
 /* interior pages sit under the absolutely-positioned header */
 .page { padding-top: clamp(140px, 18vw, 200px); }
+
+/* Shared line-drawing animations (draw a loop in, hold, erase; fade its hidden half). */
+@keyframes lm-draw {
+  0% { stroke-dashoffset: 1; }
+  30%, 76% { stroke-dashoffset: 0; }
+  94%, 100% { stroke-dashoffset: -1; }
+}
+@keyframes lm-hidden {
+  0%, 24% { opacity: 0; }
+  36%, 72% { opacity: 0.55; }
+  86%, 100% { opacity: 0; }
+}
+
+/* Outline-only display words: the form is there, the fill isn't. */
+.outline {
+  color: var(--accent);
+}
+@supports (-webkit-text-stroke: 1px black) {
+  .outline {
+    color: transparent;
+    -webkit-text-stroke: clamp(1.2px, 0.18vw, 2.5px) var(--accent);
+  }
+}
+
+/* Giant outline section numbers */
+.big-num {
+  font-family: var(--font-display);
+  font-size: clamp(6rem, 18vw, 16rem);
+  line-height: 0.8;
+  color: transparent;
+  -webkit-text-stroke: 1.5px var(--line-dim);
+  pointer-events: none;
+  user-select: none;
+}

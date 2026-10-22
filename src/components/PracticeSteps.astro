@@ -2,6 +2,7 @@
 // The practice session as a 4-step visual story: the same cylinder builds up
 // from settings, to silhouette, to imagined loops, to the drawn loop.
 import { cylinderKit, VIEWBOX } from '../lib/forms';
+import MiniPanel from './MiniPanel.astro';
 
 const k = cylinderKit();
 const imagined = [0.75, 0.25, -0.25, -0.75].map(k.loop);
@@ -43,19 +44,7 @@ const steps = [
       <li class="step" data-step={i} style={`--heat:${(0.25 + i * 0.25).toFixed(2)}`}>
         <svg viewBox={VIEWBOX} aria-hidden="true">
           {i === 0 ? (
-            <g class="panel">
-              <rect x="38" y="34" width="124" height="132" rx="12" />
-              <text x="54" y="62">IMAGES</text>
-              <rect class="field" x="54" y="70" width="92" height="18" rx="9" />
-              <text class="val" x="100" y="83">9</text>
-              <text x="54" y="108">TIME</text>
-              {[0, 1, 2].map((n) => (
-                <circle class:list={['pill', { on: n === 1 }]} cx={64 + n * 36} cy="122" r="7" />
-              ))}
-              <text x="54" y="152">FEEDBACK</text>
-              <rect class="toggle" x="118" y="143" width="28" height="14" rx="7" />
-              <circle class="knob" cx="139" cy="150" r="5" />
-            </g>
+            <MiniPanel />
           ) : (
             <>
               <g class="hidden-lines">{k.shapeHidden.map((d) => <path d={d} />)}</g>
@@ -151,15 +140,6 @@ const steps = [
   .step { --ink-line: color-mix(in srgb, var(--accent) calc(var(--heat) * 45%), var(--line)); }
   .shape path { stroke: var(--ink-line); stroke-width: 1.6; }
   .hidden-lines path { stroke: var(--ink-line); stroke-width: 1.2; stroke-dasharray: 4 5; opacity: 0.35; }
-
-  /* Step 0: a tiny settings panel */
-  .panel rect { fill: none; stroke: var(--ink-line); stroke-width: 1.4; }
-  .panel .field, .panel .toggle { stroke: var(--line-dim); }
-  .panel text { fill: var(--muted); font-family: var(--font-mono); font-size: 8px; letter-spacing: 0.08em; }
-  .panel .val { fill: var(--line); text-anchor: middle; font-size: 10px; }
-  .panel .pill { fill: none; stroke: var(--line-dim); stroke-width: 1.4; }
-  .panel .pill.on { fill: var(--accent); stroke: var(--accent); }
-  .panel .knob { fill: var(--accent); }
 
   /* Step 2: loops you only imagine — faint, breathing */
   .imagined path {

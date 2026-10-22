@@ -1,72 +1,289 @@
 ---
+import type { ImageMetadata } from 'astro';
 import { Image } from 'astro:assets';
 import Base from '../layouts/Base.astro';
-import studies from '../assets/img/practice-7.jpg';
+import MiniPanel from '../components/MiniPanel.astro';
+import { cube, sphere, cone, cylinderKit, VIEWBOX } from '../lib/forms';
+
+// Optional art: drop about-hero.jpg / about-inspiration.jpg into src/assets/img and they appear.
+const art = import.meta.glob<{ default: ImageMetadata }>('../assets/img/about-*.{jpg,jpeg,png,webp}', { eager: true });
+const pick = (name: string) => Object.entries(art).find(([k]) => k.includes(`/about-${name}.`))?.[1].default;
+const heroArt = pick('hero');
+const inspirationArt = pick('inspiration');
+
+const k = cylinderKit();
+const feedbackLoop = k.loop(0);
+const morph = [cube(), sphere(), cone()];
+
+const offers = [
+  {
+    title: 'Customizable Practice Sessions',
+    text: 'Set the number of images and timer for your practice session to suit your needs.',
+  },
+  {
+    title: 'Feedback Options',
+    text: 'Opt for immediate feedback after each drawing to quickly correct mistakes or receive a comprehensive review at the end of the session to see your overall progress.',
+  },
+  {
+    title: 'New Shapes for Every Practice',
+    text: 'Every time you practice, a new image of shapes is generated just for you from our exclusive 3D assets, ensuring a unique experience that allows you to explore and refine your artistic skills.',
+  },
+];
 ---
 
 <Base title="About" description="Why Loop Master exists: a dedicated place to practice cross-contour lines.">
-  <section class="page wrap about">
-    <div class="prose">
-      <p class="label">About us</p>
-      <h1 class="title">Mission and Offerings</h1>
-
-      <h2>What We Offer</h2>
-      <p>LoopMaster provides a simple yet powerful platform that includes:</p>
-      <ul>
-        <li>
-          <strong>Customizable Practice Sessions:</strong> Set the number of images and timer for your practice
-          session to suit your needs.
-        </li>
-        <li>
-          <strong>Feedback Options:</strong> Opt for immediate feedback after each drawing to quickly correct
-          mistakes or receive a comprehensive review at the end of the session to see your overall progress.
-        </li>
-        <li>
-          <strong>New Shapes for Every Practice:</strong> Every time you practice, a new image of shapes is
-          generated just for you from our exclusive 3D assets, ensuring a unique experience that allows you to
-          explore and refine your artistic skills.
-        </li>
-      </ul>
-
-      <h2>Our Mission</h2>
-      <p>
-        At LoopMaster, our mission is to help artists develop a deeper understanding of form and structure
-        through consistent practice. We believe that consistency is the key to success, and our platform is
-        designed to facilitate regular, focused practice sessions that enhance your ability to visualize and
-        construct 3D shapes effectively.
+  <section class:list={['page wrap manifesto', { 'has-art': heroArt }]}>
+    <div class="statement">
+      <p class="label">About us · Mission and offerings</p>
+      <h1>Consistency is the key. <span class="outline">Form</span> is the goal.</h1>
+      <p class="lede">
+        At LoopMaster, our mission is to help artists develop a deeper understanding of form and structure through
+        consistent practice. We believe that consistency is the key to success, and our platform is designed to
+        facilitate regular, focused practice sessions that enhance your ability to visualize and construct 3D shapes
+        effectively.
       </p>
+    </div>
+    {heroArt && (
+      <figure class="hero-art">
+        <Image src={heroArt} alt="" widths={[480, 800, 1200]} sizes="(max-width: 860px) 100vw, 45vw" loading="eager" />
+      </figure>
+    )}
+  </section>
 
-      <h2>Our Inspiration</h2>
+  <section class="section wrap offer" aria-labelledby="offer-title">
+    <div class="offer-head">
+      <span class="big-num" aria-hidden="true">03</span>
+      <div>
+        <p class="label">What we offer</p>
+        <h2 id="offer-title">One tool, three habits</h2>
+        <p class="muted">LoopMaster provides a simple yet powerful platform that includes:</p>
+      </div>
+    </div>
+
+    <ol class="tiles">
+      {offers.map((o, i) => (
+        <li class="tile">
+          <svg viewBox={VIEWBOX} aria-hidden="true">
+            {i === 0 && <MiniPanel />}
+            {i === 1 && (
+              <g class="feedback">
+                <g class="hidden-lines">{k.shapeHidden.map((d) => <path d={d} />)}</g>
+                <g class="shape">{k.shape.map((d) => <path d={d} />)}</g>
+                {feedbackLoop.hid.map((d) => <path class="hid" d={d} />)}
+                {feedbackLoop.vis.map((d) => <path class="vis" d={d} pathLength="1" />)}
+                <circle class="badge" cx="164" cy="44" r="16" />
+                <path class="tick" d="M156 44l6 6 10-12" />
+              </g>
+            )}
+            {i === 2 && (
+              <g class="morph">
+                {morph.map((m, n) => (
+                  <g class="frame" style={`--n:${n}`}>
+                    <g class="hidden-lines">{m.shapeHidden.map((d) => <path d={d} />)}</g>
+                    <g class="shape">{m.shape.map((d) => <path d={d} />)}</g>
+                    {m.loops.map((l) => [
+                      ...l.hid.map((d) => <path class="loop-hid" d={d} />),
+                      ...l.vis.map((d) => <path class="loop-vis" d={d} />),
+                    ])}
+                  </g>
+                ))}
+              </g>
+            )}
+          </svg>
+          <p class="label"><span class="n">{String(i + 1).padStart(2, '0')}</span></p>
+          <h3>{o.title}</h3>
+          <p class="text">{o.text}</p>
+        </li>
+      ))}
+    </ol>
+  </section>
+
+  <section class="section wrap inspiration" aria-labelledby="insp-title">
+    <div class="insp-copy">
+      <p class="label">Our inspiration</p>
+      <h2 id="insp-title">We found a <span class="outline">gap</span></h2>
       <p>
         As artists, we saw a gap in resources for practicing 3D form construction. While many platforms focus on
         gesture drawing and basic shapes, few cater to <strong>cross-contour line drawing</strong>, essential for
-        visualizing three-dimensional structures. Our daily practice revealed the need for a dedicated platform
-        that combines structure and flexibility, enabling artists to enhance their skills effectively.
+        visualizing three-dimensional structures. Our daily practice revealed the need for a dedicated platform that
+        combines structure and flexibility, enabling artists to enhance their skills effectively.
       </p>
-
-      <p class="signoff">Thank you for choosing LoopMaster.</p>
-      <p>
-        Let's draw the cross-contour line or loops and unlock the full potential of your illustrations together!
-      </p>
-      <a class="btn" href="/practice/">Start Practicing</a>
     </div>
-    <Image class="side" src={studies} alt="An artist draws a torus with cross-contour loops while referencing a tablet" widths={[400, 720]} sizes="(max-width: 860px) 100vw, 380px" />
+
+    <div class="insp-side">
+      {inspirationArt && (
+        <Image class="insp-art" src={inspirationArt} alt="" widths={[480, 800]} sizes="(max-width: 860px) 100vw, 420px" />
+      )}
+      <ul class="gap" aria-label="What practice platforms cover">
+        <li><svg viewBox="0 0 100 10" preserveAspectRatio="none" aria-hidden="true"><path d="M0 5H100" /></svg><span>Gesture drawing</span><b>✓</b></li>
+        <li><svg viewBox="0 0 100 10" preserveAspectRatio="none" aria-hidden="true"><path d="M0 5H100" /></svg><span>Basic shapes</span><b>✓</b></li>
+        <li class="missing">
+          <svg viewBox="0 0 100 10" preserveAspectRatio="none" aria-hidden="true">
+            <path class="ghost" d="M0 5H100" />
+            <path class="fill" d="M0 5H100" pathLength="1" />
+          </svg>
+          <span>Cross-contour practice</span><b>LoopMaster</b>
+        </li>
+      </ul>
+    </div>
   </section>
-  <div class="section"></div>
+
+  <section class="section wrap signoff">
+    <p class="thanks">Thank you for choosing <span class="outline">LoopMaster.</span></p>
+    <p class="muted">Let's draw the cross-contour line or loops and unlock the full potential of your illustrations together!</p>
+    <a class="btn" href="/practice/">Start Practicing</a>
+  </section>
 </Base>
 
+<script>
+  // Start the drawings when they scroll into view, pause them when they leave.
+  const io = new IntersectionObserver(
+    (entries) => entries.forEach((e) => e.target.classList.toggle('in-view', e.isIntersecting)),
+    { threshold: 0.3 },
+  );
+  document.querySelectorAll('.tiles, .gap').forEach((el) => io.observe(el));
+</script>
+
 <style>
-  .title { font-size: clamp(2.5rem, 7vw, 5rem); }
-  .about {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) minmax(0, 380px);
-    gap: clamp(32px, 6vw, 96px);
-    align-items: start;
+  /* Manifesto */
+  .manifesto { display: grid; grid-template-columns: minmax(0, 1fr); gap: 48px; align-items: center; }
+  .manifesto.has-art { grid-template-columns: minmax(0, 7fr) minmax(0, 5fr); }
+  .statement h1 { font-size: clamp(2.5rem, 7vw, 6.5rem); max-width: 14ch; margin-bottom: 0.4em; }
+  .lede { font-size: var(--step-1); color: var(--muted); max-width: 52ch; }
+  .hero-art { margin: 0; }
+  .hero-art :global(img) {
+    width: 100%;
+    border-radius: var(--radius);
+    -webkit-mask-image: radial-gradient(ellipse 70% 70% at 50% 50%, #000 55%, transparent 100%);
+    mask-image: radial-gradient(ellipse 70% 70% at 50% 50%, #000 55%, transparent 100%);
   }
-  .side { width: 100%; border-radius: var(--radius); position: sticky; top: 32px; margin-top: 140px; }
-  .signoff { font-family: var(--font-display); font-size: var(--step-2); text-transform: uppercase; color: var(--accent); margin-top: 2em; }
   @media (max-width: 860px) {
-    .about { grid-template-columns: minmax(0, 1fr); }
-    .side { position: static; margin-top: 0; max-width: 420px; }
+    .manifesto.has-art { grid-template-columns: minmax(0, 1fr); }
+  }
+
+  /* What we offer */
+  .offer { border-top: 1px solid var(--line-dim); }
+  .offer-head { position: relative; display: flex; align-items: flex-end; gap: 24px; }
+  .offer-head .big-num { flex: none; }
+  @media (max-width: 640px) { .offer-head .big-num { display: none; } }
+  .tiles {
+    list-style: none;
+    margin: 48px 0 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 20px;
+  }
+  @media (max-width: 900px) { .tiles { grid-template-columns: minmax(0, 1fr); } }
+  .tile {
+    padding: 24px;
+    background: var(--ink-2);
+    border: 1px solid var(--line-dim);
+    border-top: 2px solid var(--accent);
+    border-radius: var(--radius);
+  }
+  .tile svg {
+    width: 100%;
+    max-width: 240px;
+    aspect-ratio: 1;
+    display: block;
+    margin: 0 auto 16px;
+    background: radial-gradient(circle, rgb(255 153 51 / 0.12) 0%, transparent 65%);
+    border-radius: 50%;
+  }
+  .tile .n { color: var(--accent); }
+  .tile .label { margin: 0 0 6px; }
+  .tile .text { margin: 0; font-size: 0.9375rem; color: var(--muted); }
+
+  svg path { fill: none; stroke-linecap: round; stroke-linejoin: round; }
+  .shape path { stroke: var(--line); stroke-width: 1.6; }
+  .hidden-lines path { stroke: var(--line); stroke-width: 1.2; stroke-dasharray: 4 5; opacity: 0.35; }
+
+  /* Feedback tile: a loop is drawn, then checked */
+  .feedback .vis { stroke: var(--accent); stroke-width: 2.4; stroke-dasharray: 1; stroke-dashoffset: 1; animation: lm-draw 5s cubic-bezier(0.6, 0, 0.3, 1) infinite both paused; }
+  .feedback .hid { stroke: var(--accent); stroke-width: 1.6; stroke-dasharray: 4 5; opacity: 0; animation: lm-hidden 5s ease infinite both paused; }
+  .feedback .badge { fill: var(--accent); opacity: 0; animation: tick-in 5s ease infinite both paused; }
+  .feedback .tick { stroke: var(--ink); stroke-width: 3; opacity: 0; animation: tick-in 5s ease infinite both paused; }
+  @keyframes tick-in {
+    0%, 30% { opacity: 0; }
+    36%, 76% { opacity: 1; }
+    88%, 100% { opacity: 0; }
+  }
+
+  /* New shapes tile: cube → sphere → cone, crossfading */
+  .morph .frame { opacity: 0; animation: morph 9s ease-in-out infinite both paused; animation-delay: calc(var(--n) * 3s); }
+  .morph .loop-vis { stroke: var(--accent); stroke-width: 2; }
+  .morph .loop-hid { stroke: var(--accent); stroke-width: 1.4; stroke-dasharray: 4 5; opacity: 0.5; }
+  @keyframes morph {
+    0% { opacity: 0; }
+    8%, 30% { opacity: 1; }
+    38%, 100% { opacity: 0; }
+  }
+
+  .tiles:global(.in-view) .vis,
+  .tiles:global(.in-view) .hid,
+  .tiles:global(.in-view) .badge,
+  .tiles:global(.in-view) .tick,
+  .tiles:global(.in-view) .frame { animation-play-state: running; }
+
+  /* Inspiration */
+  .inspiration {
+    border-top: 1px solid var(--line-dim);
+    display: grid;
+    grid-template-columns: minmax(0, 6fr) minmax(0, 5fr);
+    gap: clamp(32px, 6vw, 96px);
+    align-items: center;
+  }
+  @media (max-width: 860px) { .inspiration { grid-template-columns: minmax(0, 1fr); } }
+  .inspiration strong { color: var(--accent); font-weight: 600; }
+  .insp-side :global(.insp-art) {
+    width: 100%;
+    margin-bottom: 32px;
+    border-radius: var(--radius);
+    -webkit-mask-image: linear-gradient(to bottom, #000 60%, transparent 100%);
+    mask-image: linear-gradient(to bottom, #000 60%, transparent 100%);
+  }
+  .gap { list-style: none; margin: 0; padding: 0; display: grid; gap: 22px; }
+  .gap li {
+    display: grid;
+    grid-template-columns: minmax(60px, 1fr) 24ch 11ch;
+    align-items: center;
+    gap: 14px;
+    font-family: var(--font-mono);
+    font-size: 0.875rem;
+    letter-spacing: 0.04em;
+  }
+  .gap svg { width: 100%; height: 10px; overflow: visible; }
+  @media (max-width: 560px) {
+    .gap li { grid-template-columns: 40px minmax(0, 1fr) auto; gap: 10px; font-size: 0.8125rem; }
+  }
+  .gap path { stroke: var(--line); stroke-width: 2; vector-effect: non-scaling-stroke; }
+  .gap b { font-weight: 500; color: var(--muted); }
+  .gap .missing span { color: var(--line); }
+  .gap .missing .ghost { stroke-dasharray: 6 6; opacity: 0.45; }
+  .gap .missing .fill { stroke: var(--accent); stroke-width: 3; stroke-dasharray: 1; stroke-dashoffset: 1; transition: stroke-dashoffset 1.6s cubic-bezier(0.6, 0, 0.3, 1) 0.4s; }
+  .gap .missing b { color: var(--accent); opacity: 0; transition: opacity 0.5s ease 1.8s; }
+  .gap:global(.in-view) .missing .fill { stroke-dashoffset: 0; }
+  .gap:global(.in-view) .missing b { opacity: 1; }
+
+  /* Sign-off */
+  .signoff { border-top: 1px solid var(--line-dim); text-align: center; }
+  .thanks {
+    font-family: var(--font-display);
+    font-size: clamp(2rem, 5.5vw, 4.5rem);
+    line-height: 1.05;
+    text-transform: uppercase;
+    max-width: 18ch;
+    margin: 0 auto 0.5em;
+  }
+  .signoff .muted { margin-inline: auto; }
+  .signoff .btn { margin-top: 12px; }
+
+  @media (prefers-reduced-motion: reduce) {
+    .feedback .vis { animation: none; stroke-dashoffset: 0; }
+    .feedback .hid { animation: none; opacity: 0.55; }
+    .feedback .badge, .feedback .tick { animation: none; opacity: 1; }
+    .morph .frame { animation: none; }
+    .morph .frame:first-child { opacity: 1; }
   }
 </style>
