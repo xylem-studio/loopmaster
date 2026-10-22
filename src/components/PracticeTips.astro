@@ -115,21 +115,46 @@ const NO = 'M-7 -7L7 7M7 -7L-7 7';
   @media (max-width: 760px) { .cards { grid-template-columns: minmax(0, 1fr); } }
 
   .card {
+    position: relative;
     display: grid;
     grid-template-columns: minmax(120px, 200px) minmax(0, 1fr);
-    grid-template-rows: auto 1fr;
+    grid-template-rows: auto auto 1fr;
     column-gap: 24px;
     padding: 24px;
     background: var(--ink-2);
     border: 1px solid var(--line-dim);
+    border-top: 2px solid var(--accent);
     border-radius: var(--radius);
+    counter-increment: tip;
+    transition: border-color 0.2s, box-shadow 0.2s;
   }
-  .card svg { grid-row: 1 / 3; width: 100%; aspect-ratio: 1; align-self: center; }
+  .card:hover { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent), 0 12px 40px -18px rgb(255 153 51 / 0.45); }
+  .cards { counter-reset: tip; }
+  .card::before {
+    content: 'Tip ' counter(tip, decimal-leading-zero);
+    grid-column: 2;
+    font-family: var(--font-mono);
+    font-size: var(--step-label);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--accent);
+  }
+  .card svg {
+    grid-column: 1;
+    grid-row: 1 / 4;
+    width: 100%;
+    aspect-ratio: 1;
+    align-self: center;
+    /* Soft orange glow behind each diagram. */
+    background: radial-gradient(circle at 50% 50%, rgb(255 153 51 / 0.14) 0%, transparent 65%);
+    border-radius: 50%;
+  }
   .card h3 { margin: 4px 0 8px; }
   .card p { margin: 0; font-size: 0.9375rem; color: var(--muted); }
   @media (max-width: 480px) {
     .card { grid-template-columns: minmax(0, 1fr); }
     .card svg { grid-row: auto; max-width: 220px; margin-bottom: 12px; }
+    .card::before { grid-column: 1; grid-row: 2; }
   }
 
   svg path { fill: none; stroke-linecap: round; stroke-linejoin: round; }

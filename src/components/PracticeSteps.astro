@@ -40,7 +40,7 @@ const steps = [
 
   <ol class="timeline">
     {steps.map((s, i) => (
-      <li class="step" data-step={i}>
+      <li class="step" data-step={i} style={`--heat:${(0.25 + i * 0.25).toFixed(2)}`}>
         <svg viewBox={VIEWBOX} aria-hidden="true">
           {i === 0 ? (
             <g class="panel">
@@ -106,14 +106,28 @@ const steps = [
   @media (max-width: 1000px) { .timeline { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
   @media (max-width: 560px) { .timeline { grid-template-columns: minmax(0, 1fr); } }
 
+  /* The session "heats up": each step is a little more orange than the last. */
   .step {
     position: relative;
     display: flex;
     flex-direction: column;
     padding: 20px;
-    background: var(--ink-2);
-    border: 1px solid var(--line-dim);
+    background: linear-gradient(
+      180deg,
+      color-mix(in srgb, var(--accent) calc(var(--heat) * 16%), var(--ink-2)) 0%,
+      var(--ink-2) 65%
+    );
+    border: 1px solid color-mix(in srgb, var(--accent) calc(var(--heat) * 75%), var(--line-dim));
     border-radius: var(--radius);
+    overflow: hidden;
+  }
+  .step::before {
+    content: '';
+    position: absolute;
+    inset: 0 0 auto;
+    height: 3px;
+    background: var(--accent);
+    opacity: var(--heat);
   }
   /* A thin connector between steps on wide screens: the session flows left to right. */
   @media (min-width: 1001px) {
@@ -124,6 +138,7 @@ const steps = [
       right: -21px;
       width: 21px;
       border-top: 1px dashed var(--accent);
+      opacity: var(--heat);
     }
   }
   svg { width: 100%; max-width: 240px; aspect-ratio: 1; margin: 0 auto 12px; }
@@ -133,11 +148,12 @@ const steps = [
   .text { margin: 0; font-size: 0.9375rem; color: var(--muted); }
 
   svg path { fill: none; stroke-linecap: round; stroke-linejoin: round; }
-  .shape path { stroke: var(--line); stroke-width: 1.6; }
-  .hidden-lines path { stroke: var(--line); stroke-width: 1.2; stroke-dasharray: 4 5; opacity: 0.35; }
+  .step { --ink-line: color-mix(in srgb, var(--accent) calc(var(--heat) * 45%), var(--line)); }
+  .shape path { stroke: var(--ink-line); stroke-width: 1.6; }
+  .hidden-lines path { stroke: var(--ink-line); stroke-width: 1.2; stroke-dasharray: 4 5; opacity: 0.35; }
 
   /* Step 0: a tiny settings panel */
-  .panel rect { fill: none; stroke: var(--line); stroke-width: 1.4; }
+  .panel rect { fill: none; stroke: var(--ink-line); stroke-width: 1.4; }
   .panel .field, .panel .toggle { stroke: var(--line-dim); }
   .panel text { fill: var(--muted); font-family: var(--font-mono); font-size: 8px; letter-spacing: 0.08em; }
   .panel .val { fill: var(--line); text-anchor: middle; font-size: 10px; }
