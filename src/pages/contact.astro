@@ -1,17 +1,10 @@
 ---
-import type { ImageMetadata } from 'astro';
-import { Image } from 'astro:assets';
 import Base from '../layouts/Base.astro';
-import { sphere, VIEWBOX } from '../lib/forms';
+import ContactPlane from '../components/ContactPlane.astro';
 
 const email = 'hi@contrastic.io';
 const topics = ['Feedback', 'Bug report', 'Feature idea', 'Collaboration'];
 const mailto = (topic: string) => `mailto:${email}?subject=${encodeURIComponent(`Loop Master — ${topic}`)}`;
-
-// Optional art: drop contact-art.jpg into src/assets/img and it replaces the sphere.
-const art = import.meta.glob<{ default: ImageMetadata }>('../assets/img/contact-art.{jpg,jpeg,png,webp}', { eager: true });
-const contactArt = Object.values(art)[0]?.default;
-const s = sphere();
 ---
 
 <Base title="Contact" description="Questions, feedback or suggestions for Loop Master.">
@@ -36,20 +29,8 @@ const s = sphere();
       </p>
     </div>
 
-    <figure class="art" aria-hidden="true">
-      {contactArt ? (
-        <Image src={contactArt} alt="" widths={[480, 800, 1200]} sizes="(max-width: 860px) 100vw, 45vw" loading="eager" />
-      ) : (
-        <svg viewBox={VIEWBOX}>
-          <g class="shape">{s.shape.map((d) => <path d={d} />)}</g>
-          {s.loops.map((l, i) => (
-            <g class="loop" style={`--d:${i * 0.35}s`}>
-              {l.hid.map((d) => <path class="hid" d={d} />)}
-              {l.vis.map((d) => <path class="vis" d={d} pathLength="1" />)}
-            </g>
-          ))}
-        </svg>
-      )}
+    <figure class="art">
+      <ContactPlane />
     </figure>
   </section>
   <div class="section"></div>
@@ -118,39 +99,4 @@ const s = sphere();
   .itch a { color: var(--line); }
 
   .art { margin: 0; }
-  .art :global(img) {
-    width: 100%;
-    border-radius: var(--radius);
-    -webkit-mask-image: radial-gradient(ellipse 70% 70% at 50% 50%, #000 55%, transparent 100%);
-    mask-image: radial-gradient(ellipse 70% 70% at 50% 50%, #000 55%, transparent 100%);
-  }
-  .art svg {
-    width: 100%;
-    max-width: 460px;
-    display: block;
-    margin-inline: auto;
-    overflow: visible;
-    background: radial-gradient(circle, rgb(255 153 51 / 0.12) 0%, transparent 62%);
-    border-radius: 50%;
-  }
-  svg path { fill: none; stroke-linecap: round; stroke-linejoin: round; }
-  .shape path { stroke: var(--line); stroke-width: 1.2; }
-  .loop .vis {
-    stroke: var(--accent);
-    stroke-width: 1.6;
-    stroke-dasharray: 1;
-    stroke-dashoffset: 1;
-    animation: lm-draw 7s cubic-bezier(0.6, 0, 0.3, 1) var(--d) infinite both;
-  }
-  .loop .hid {
-    stroke: var(--accent);
-    stroke-width: 1.1;
-    stroke-dasharray: 3 5;
-    opacity: 0;
-    animation: lm-hidden 7s ease var(--d) infinite both;
-  }
-  @media (prefers-reduced-motion: reduce) {
-    .loop .vis { animation: none; stroke-dashoffset: 0; }
-    .loop .hid { animation: none; opacity: 0.55; }
-  }
 </style>

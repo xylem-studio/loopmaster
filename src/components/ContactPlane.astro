@@ -1,0 +1,79 @@
+---
+// A paper airplane drawn in construction lines, flying a loop-the-loop.
+// Its flight path is a faint dashed "hidden" line; an orange trail follows it.
+// Plane and trail share one SVG (SMIL) timeline, so they never drift apart.
+
+const FLIGHT = 'M10 300C90 308 170 286 216 236C266 182 276 100 222 84C162 66 140 144 190 180C240 216 322 196 392 112';
+const DUR = '7s';
+
+// Plane in local coordinates, nose pointing +x.
+const N = [42, 0], L = [-40, -26], R = [-40, 20], C = [-28, 0], K = [-30, 12];
+const lerp = (a: number[], b: number[], t: number) => [a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t];
+const pt = (p: number[]) => `${p[0].toFixed(1)} ${p[1].toFixed(1)}`;
+// Cross-sections across the plane: top wing edge → centre fold → lower wing edge (seen),
+// and the keel underneath (hidden).
+const sections = [0.25, 0.45, 0.65, 0.85].map((t) => {
+  const top = lerp(N, L, t), fold = lerp(N, C, t), bottom = lerp(N, R, t), keel = lerp(N, K, t);
+  return { seen: `M${pt(top)}L${pt(fold)}L${pt(bottom)}`, hidden: `M${pt(fold)}L${pt(keel)}` };
+});
+---
+
+<svg class="plane-art" viewBox="0 0 400 360" role="img" aria-label="A paper airplane drawn in cross-contour lines, flying a loop">
+  <!-- The whole flight path, as a hidden line -->
+  <path class="route" d={FLIGHT} />
+  <!-- The trail: a short dash that travels with the plane. The gap is longer than the
+       path, so the dash never wraps round to the other end. -->
+  <path class="trail" d={FLIGHT} pathLength="1" stroke-dasharray="0.22 1">
+    <animate attributeName="stroke-dashoffset" from="0.22" to="-0.78" dur={DUR} repeatCount="indefinite" />
+  </path>
+
+  <g class="plane">
+    <animateMotion dur={DUR} repeatCount="indefinite" rotate="auto" path={FLIGHT} />
+    <animate attributeName="opacity" values="0;1;1;0" keyTimes="0;0.06;0.92;1" dur={DUR} repeatCount="indefinite" />
+    <g transform="scale(1.4)">
+      <g class="body">
+        <path d={`M${pt(N)}L${pt(L)}L${pt(C)}Z`} />
+        <path d={`M${pt(N)}L${pt(R)}L${pt(C)}`} />
+      </g>
+      <path class="keel" d={`M${pt(N)}L${pt(K)}L${pt(C)}`} />
+      {sections.map((s) => (
+        <>
+          <path class="sec-hid" d={s.hidden} />
+          <path class="sec" d={s.seen} />
+        </>
+      ))}
+    </g>
+  </g>
+</svg>
+
+<script>
+  const svg = document.querySelector<SVGSVGElement>('.plane-art');
+  if (svg) {
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      // Freeze mid-loop.
+      svg.setCurrentTime(4.2);
+      svg.pauseAnimations();
+    } else {
+      new IntersectionObserver(([e]) => (e.isIntersecting ? svg.unpauseAnimations() : svg.pauseAnimations())).observe(svg);
+    }
+  }
+</script>
+
+<style>
+  .plane-art {
+    width: 100%;
+    max-width: 520px;
+    display: block;
+    margin-inline: auto;
+    overflow: visible;
+    background: radial-gradient(circle at 52% 52%, rgb(255 153 51 / 0.12) 0%, transparent 62%);
+  }
+  path { fill: none; stroke-linecap: round; stroke-linejoin: round; }
+  .route { stroke: var(--line); stroke-width: 1.2; stroke-dasharray: 4 7; opacity: 0.3; }
+  .trail { stroke: var(--accent); stroke-width: 2.4; }
+  /* Strokes inside the scaled plane are divided by the scale to keep them crisp. */
+  .body path { stroke: var(--line); stroke-width: 1.2; fill: rgb(0 15 7 / 0.85); }
+  .keel { stroke: var(--line); stroke-width: 1; stroke-dasharray: 2.5 3; opacity: 0.6; }
+  .sec { stroke: var(--accent); stroke-width: 1.2; }
+  .sec-hid { stroke: var(--accent); stroke-width: 0.9; stroke-dasharray: 2 2.5; opacity: 0.6; }
+</style>
