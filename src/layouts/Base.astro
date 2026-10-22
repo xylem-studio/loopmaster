@@ -67,8 +67,11 @@ const isCurrent = (href: string) => (href === '/' ? path === '/' : path === href
     <footer class="site-footer">
       <div class="wrap foot">
         <div class="foot-brand">
+          <a href="/" class="foot-logo" aria-label="Loop Master home">
+            <Image src={logo} alt="" width={220} densities={[1, 2]} />
+          </a>
           <p class="foot-tag">Draw the <span class="outline">Unseen</span></p>
-          <a class="foot-mail" href="mailto:zinnia_art@proton.me">zinnia_art@proton.me</a>
+          <a class="foot-mail" href="mailto:hi@contrastic.io">hi@contrastic.io</a>
         </div>
         <nav aria-label="Footer">
           <p class="label">Site</p>
@@ -85,7 +88,10 @@ const isCurrent = (href: string) => (href === '/' ? path === '/' : path === href
             <li><a href="https://zinnia-art.itch.io/loop-master" rel="noopener">Loop Master on itch.io ↗</a></li>
           </ul>
         </div>
-        <p class="label copy">Copyright © {new Date().getFullYear()} Loop Master</p>
+        <div class="foot-bottom">
+          <p class="label">Copyright © {new Date().getFullYear()} Loop Master</p>
+          <p class="label">Website by <a href="https://contrastic.io" rel="noopener">contrastic.io</a></p>
+        </div>
       </div>
     </footer>
   </body>
@@ -153,7 +159,19 @@ const isCurrent = (href: string) => (href === '/' ? path === '/' : path === href
     margin-bottom: 14px !important;
   }
   .foot .foot-mail { font-family: var(--font-mono); color: var(--accent); }
-  .foot .copy { grid-column: 1 / -1; max-width: none; padding-top: 24px; border-top: 1px solid var(--line-dim); }
+  .foot-logo { display: inline-block; margin-bottom: 18px; }
+  .foot-logo img { width: clamp(180px, 18vw, 220px); }
+  .foot-bottom {
+    grid-column: 1 / -1;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 8px 24px;
+    padding-top: 24px;
+    border-top: 1px solid var(--line-dim);
+  }
+  .foot-bottom a { font-size: inherit; color: var(--line); text-decoration: underline; text-decoration-color: var(--accent); }
+  .foot-bottom a:hover { color: var(--accent); }
   @media (max-width: 700px) {
     .foot { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
     .foot-brand { grid-column: 1 / -1; }
