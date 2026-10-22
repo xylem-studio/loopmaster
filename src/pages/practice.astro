@@ -1,151 +1,151 @@
 ---
-import { Image } from 'astro:assets';
 import Base from '../layouts/Base.astro';
-import loopRight from '../assets/img/practice-9.jpg';
-import loopCompare from '../assets/img/practice-11.jpg';
+import PracticeSteps from '../components/PracticeSteps.astro';
+import PracticeTips from '../components/PracticeTips.astro';
 
 const game = '/practice/web/v7/formmaster_session.html';
 ---
 
 <Base title="Practice" description="Run a timed cross-contour practice session in your browser.">
-  <section class="page wrap">
-    <p class="label">Practice session</p>
-    <h1 class="title">Begin your practice</h1>
-    <p class="lede">
-      Select your <strong>preferred settings</strong> for the session, including the type of feedback and
-      duration.
-    </p>
-  </section>
+  <section class="page wrap desk" aria-labelledby="practice-title">
+    <header class="desk-head">
+      <div>
+        <p class="label">Practice session</p>
+        <h1 id="practice-title">Begin your practice</h1>
+      </div>
+      <p class="lede">
+        Select your <strong>preferred settings</strong> for the session, including the type of feedback and
+        duration.
+      </p>
+    </header>
 
-  <section class="wrap game-wrap" aria-label="Loop Master practice session">
-    <div class="game">
+    <div class="game" data-game>
       <iframe
         src={game}
         title="Loop Master practice session"
-        loading="lazy"
         allow="fullscreen"
         sandbox="allow-same-origin allow-popups allow-top-navigation-by-user-activation allow-scripts allow-modals allow-downloads allow-pointer-lock allow-presentation"
       ></iframe>
-    </div>
-    <p class="game-links label">
-      <a href={game} target="_blank" rel="noopener">Open full window ↗</a>
-      <span aria-hidden="true">·</span>
-      <a href="https://zinnia-art.itch.io/loop-master" rel="noopener">Use Loop Master on itch.io ↗</a>
-    </p>
-  </section>
-
-  <section class="section wrap guide">
-    <div class="prose">
-      <p class="label">How to practice</p>
-      <h2>Instructions for the Practice Session</h2>
-      <p>Although nothing is absolute, here are some instructions that might help you in your practice:</p>
-
-      <h3>Before starting</h3>
-      <ol>
-        <li>
-          <strong>Choose your session settings.</strong> Select your preferred settings for the session,
-          including the type of feedback and duration.
-        </li>
-      </ol>
-
-      <h3>During the session</h3>
-      <ol>
-        <li>
-          <strong>Draw the shape first.</strong> Begin by drawing the shape shown on the screen. Focus on capturing
-          its overall form and proportions accurately.
-        </li>
-        <li>
-          <strong>Visualize the cross contour lines.</strong> Once you have drawn the shape, take a moment to
-          visualize the cross contour lines. Imagine how these lines would wrap around the form, following its
-          curves and contours.
-        </li>
-        <li>
-          <strong>Draw the complete or visible cross contour lines.</strong> Decide whether you want to draw the
-          complete cross contour lines or just the visible ones. If drawing only the visible lines, make sure they
-          “hug” the shape, wrapping around its surface to convey depth and volume.
-        </li>
-      </ol>
+      <button class="exit label" type="button" data-exit>Exit focus ✕</button>
     </div>
 
-    <figure class="example">
-      <Image src={loopRight} alt="A cylinder with one orange cross-contour loop around its middle; the hidden back half is dashed" widths={[400, 800]} sizes="(max-width: 860px) 100vw, 400px" />
-      <figcaption class="label">A complete loop: visible half solid, hidden half dashed.</figcaption>
-    </figure>
-  </section>
-
-  <section class="section wrap guide tips">
-    <div class="prose">
-      <p class="label">Tips</p>
-      <h2>Tips for Drawing Cross Contour Lines</h2>
-      <h3>Visualize the full form</h3>
-      <p>
-        Even if you’re only drawing the visible cross contour lines, mentally visualize the entire form,
-        including the hidden lines. This helps in creating a more accurate and convincing depiction.
-      </p>
-      <h3>Draw complete contour lines</h3>
-      <p>
-        Practice drawing the full contour lines around the object, not just the visible parts. This will help you
-        understand the form better and improve your ability to visualize 3D shapes.
-      </p>
-      <h3>Hug the shape</h3>
-      <p>
-        When drawing visible cross contour lines, make sure they “hug” the shape, following its curves and
-        contours closely. Avoid drawing straight lines; instead, let the lines wrap around the form to convey
-        depth and volume.
-      </p>
-      <h3>Consistency is key</h3>
-      <p>
-        Make drawing cross contour lines a regular part of your practice routine. Consistency will help you
-        develop a stronger understanding of form and improve your overall drawing skills.
-      </p>
+    <div class="toolbar">
+      <button class="btn" type="button" data-focus>
+        <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M1 5V1h4M11 1h4v4M15 11v4h-4M5 15H1v-4" /></svg>
+        Focus mode
+      </button>
+      <a class="label" href={game} target="_blank" rel="noopener">Open in new window ↗</a>
+      <a class="label" href="https://zinnia-art.itch.io/loop-master" rel="noopener">Use Loop Master on itch.io ↗</a>
+      <p class="phone-note label">Best on a tablet or computer with a pen or mouse.</p>
     </div>
-
-    <figure class="example">
-      <Image src={loopCompare} alt="Two loops on a cylinder: a curved one marked correct, a flat straight one marked wrong" widths={[400, 800]} sizes="(max-width: 860px) 100vw, 400px" />
-      <figcaption class="label">Curve with the form (✓), not straight across it (✗).</figcaption>
-    </figure>
   </section>
+
+  <PracticeSteps />
+  <PracticeTips />
 </Base>
 
-<style>
-  .title { font-size: clamp(2.5rem, 7vw, 5rem); }
-  .lede { font-size: var(--step-1); }
-  .lede strong { color: var(--accent); font-weight: 500; }
+<script>
+  const game = document.querySelector<HTMLElement>('[data-game]');
+  const focusBtn = document.querySelector<HTMLButtonElement>('[data-focus]');
+  const exitBtn = document.querySelector<HTMLButtonElement>('[data-exit]');
 
-  .game-wrap { padding-block: 24px 0; }
+  if (game && focusBtn && exitBtn) {
+    // Real fullscreen where the browser allows it on an element; otherwise
+    // (e.g. iPhone Safari) fill the viewport with CSS.
+    const canFullscreen = document.fullscreenEnabled && typeof game.requestFullscreen === 'function';
+    const setCssFocus = (on: boolean) => {
+      game.classList.toggle('is-focus', on);
+      document.documentElement.classList.toggle('no-scroll', on);
+    };
+
+    focusBtn.addEventListener('click', async () => {
+      if (canFullscreen) {
+        try {
+          await game.requestFullscreen();
+          return;
+        } catch {
+          /* fall through to the CSS version */
+        }
+      }
+      setCssFocus(true);
+    });
+    exitBtn.addEventListener('click', () => {
+      if (document.fullscreenElement) document.exitFullscreen();
+      setCssFocus(false);
+    });
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && game.classList.contains('is-focus')) setCssFocus(false);
+    });
+    // Hand keyboard focus to the game when entering focus mode.
+    const focusGame = () => game.querySelector('iframe')?.focus();
+    document.addEventListener('fullscreenchange', () => document.fullscreenElement && focusGame());
+  }
+</script>
+
+<style>
+  .desk-head {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    align-items: end;
+    gap: 16px 48px;
+    margin-bottom: 24px;
+  }
+  .desk-head h1 { font-size: clamp(2.25rem, 5vw, 3.75rem); margin: 0; }
+  .desk-head .lede { margin: 0; max-width: 46ch; justify-self: end; color: var(--muted); }
+  .lede strong { color: var(--accent); font-weight: 500; }
+  @media (max-width: 860px) {
+    .desk-head { grid-template-columns: minmax(0, 1fr); }
+    .desk-head .lede { justify-self: start; }
+  }
+
   .game {
     position: relative;
     width: 100%;
-    aspect-ratio: 16 / 10;
-    min-height: 480px;
-    max-height: 85svh;
+    height: clamp(420px, calc(100svh - 300px), 900px);
     background: #000;
     border: 1px solid var(--line-dim);
     border-radius: var(--radius);
     overflow: hidden;
   }
-  .game iframe {
-    position: absolute;
-    inset: 0;
-    width: 100%;
-    height: 100%;
-    border: 0;
-  }
-  .game-links { display: flex; flex-wrap: wrap; gap: 8px 12px; margin-top: 14px; }
-  .game-links a { color: var(--line); }
+  .game iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
 
-  .guide {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) minmax(0, 380px);
-    gap: clamp(32px, 6vw, 96px);
-    align-items: start;
+  /* Focus mode: real fullscreen, or the CSS fallback. */
+  .game:fullscreen { border: 0; border-radius: 0; height: 100%; }
+  .game.is-focus {
+    position: fixed;
+    inset: 0;
+    z-index: 100;
+    height: auto;
+    border: 0;
+    border-radius: 0;
   }
-  .tips { padding-top: 0; }
-  .example { margin: 0; position: sticky; top: 32px; }
-  .example img { width: 100%; border-radius: var(--radius); }
-  .example figcaption { margin-top: 10px; }
-  @media (max-width: 860px) {
-    .guide { grid-template-columns: minmax(0, 1fr); }
-    .example { position: static; max-width: 420px; }
+  .exit {
+    display: none;
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    padding: 8px 12px;
+    background: rgb(0 15 7 / 0.85);
+    color: var(--line);
+    border: 1px solid var(--line-dim);
+    border-radius: var(--radius);
+    cursor: pointer;
+  }
+  .game:fullscreen .exit,
+  .game.is-focus .exit { display: block; }
+  :global(html.no-scroll) { overflow: hidden; }
+
+  .toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 12px 24px;
+    margin-top: 16px;
+  }
+  .toolbar .btn svg { width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 1.8; }
+  .toolbar a { color: var(--line); }
+  .phone-note { display: none; margin: 0; flex-basis: 100%; color: var(--accent); }
+  @media (max-width: 760px), (pointer: coarse) and (max-width: 900px) {
+    .phone-note { display: block; }
   }
 </style>

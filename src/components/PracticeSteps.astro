@@ -1,0 +1,194 @@
+---
+// The practice session as a 4-step visual story: the same cylinder builds up
+// from settings, to silhouette, to imagined loops, to the drawn loop.
+import { cylinderKit, VIEWBOX } from '../lib/forms';
+
+const k = cylinderKit();
+const imagined = [0.75, 0.25, -0.25, -0.75].map(k.loop);
+const drawn = k.loop(0);
+
+const steps = [
+  {
+    title: 'Choose your session settings',
+    text: 'Select your preferred settings for the session, including the type of feedback and duration.',
+    stage: 'Before starting',
+  },
+  {
+    title: 'Draw the shape first',
+    text: 'Begin by drawing the shape shown on the screen. Focus on capturing its overall form and proportions accurately.',
+    stage: 'During the session',
+  },
+  {
+    title: 'Visualize the cross contour lines',
+    text: 'Once you have drawn the shape, take a moment to visualize the cross contour lines. Imagine how these lines would wrap around the form, following its curves and contours.',
+    stage: 'During the session',
+  },
+  {
+    title: 'Draw the complete or visible cross contour lines',
+    text: 'Decide whether you want to draw the complete cross contour lines or just the visible ones. If drawing only the visible lines, make sure they “hug” the shape, wrapping around its surface to convey depth and volume.',
+    stage: 'During the session',
+  },
+];
+---
+
+<section class="section wrap steps" aria-labelledby="steps-title">
+  <div class="head">
+    <p class="label">How to practice</p>
+    <h2 id="steps-title">Instructions for the Practice Session</h2>
+    <p class="muted">Although nothing is absolute, here are some instructions that might help you in your practice:</p>
+  </div>
+
+  <ol class="timeline">
+    {steps.map((s, i) => (
+      <li class="step" data-step={i}>
+        <svg viewBox={VIEWBOX} aria-hidden="true">
+          {i === 0 ? (
+            <g class="panel">
+              <rect x="38" y="34" width="124" height="132" rx="12" />
+              <text x="54" y="62">IMAGES</text>
+              <rect class="field" x="54" y="70" width="92" height="18" rx="9" />
+              <text class="val" x="100" y="83">9</text>
+              <text x="54" y="108">TIME</text>
+              {[0, 1, 2].map((n) => (
+                <circle class:list={['pill', { on: n === 1 }]} cx={64 + n * 36} cy="122" r="7" />
+              ))}
+              <text x="54" y="152">FEEDBACK</text>
+              <rect class="toggle" x="118" y="143" width="28" height="14" rx="7" />
+              <circle class="knob" cx="139" cy="150" r="5" />
+            </g>
+          ) : (
+            <>
+              <g class="hidden-lines">{k.shapeHidden.map((d) => <path d={d} />)}</g>
+              <g class="shape">{k.shape.map((d) => <path d={d} />)}</g>
+              {i === 2 && (
+                <g class="imagined">
+                  {imagined.flatMap((l) => [...l.vis, ...l.hid]).map((d) => <path d={d} />)}
+                </g>
+              )}
+              {i === 3 && (
+                <g class="drawn">
+                  {drawn.hid.map((d) => <path class="hid" d={d} />)}
+                  {drawn.vis.map((d) => <path class="vis" d={d} pathLength="1" />)}
+                </g>
+              )}
+            </>
+          )}
+        </svg>
+        <p class="label"><span class="n">{String(i).padStart(2, '0')}</span> {s.stage}</p>
+        <h3>{s.title}</h3>
+        <p class="text">{s.text}</p>
+      </li>
+    ))}
+  </ol>
+</section>
+
+<script>
+  const steps = document.querySelector('.steps .timeline');
+  if (steps) {
+    const io = new IntersectionObserver(([e]) => steps.classList.toggle('in-view', e.isIntersecting), {
+      threshold: 0.25,
+    });
+    io.observe(steps);
+  }
+</script>
+
+<style>
+  .head { max-width: 640px; }
+  .timeline {
+    list-style: none;
+    margin: 48px 0 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 20px;
+    counter-reset: step;
+  }
+  @media (max-width: 1000px) { .timeline { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+  @media (max-width: 560px) { .timeline { grid-template-columns: minmax(0, 1fr); } }
+
+  .step {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    padding: 20px;
+    background: var(--ink-2);
+    border: 1px solid var(--line-dim);
+    border-radius: var(--radius);
+  }
+  /* A thin connector between steps on wide screens: the session flows left to right. */
+  @media (min-width: 1001px) {
+    .step:not(:last-child)::after {
+      content: '';
+      position: absolute;
+      top: 50%;
+      right: -21px;
+      width: 21px;
+      border-top: 1px dashed var(--accent);
+    }
+  }
+  svg { width: 100%; max-width: 240px; aspect-ratio: 1; margin: 0 auto 12px; }
+  .label { margin: 0 0 6px; }
+  .label .n { color: var(--accent); margin-right: 6px; }
+  h3 { font-size: 1.0625rem; margin: 0 0 8px; }
+  .text { margin: 0; font-size: 0.9375rem; color: var(--muted); }
+
+  svg path { fill: none; stroke-linecap: round; stroke-linejoin: round; }
+  .shape path { stroke: var(--line); stroke-width: 1.6; }
+  .hidden-lines path { stroke: var(--line); stroke-width: 1.2; stroke-dasharray: 4 5; opacity: 0.35; }
+
+  /* Step 0: a tiny settings panel */
+  .panel rect { fill: none; stroke: var(--line); stroke-width: 1.4; }
+  .panel .field, .panel .toggle { stroke: var(--line-dim); }
+  .panel text { fill: var(--muted); font-family: var(--font-mono); font-size: 8px; letter-spacing: 0.08em; }
+  .panel .val { fill: var(--line); text-anchor: middle; font-size: 10px; }
+  .panel .pill { fill: none; stroke: var(--line-dim); stroke-width: 1.4; }
+  .panel .pill.on { fill: var(--accent); stroke: var(--accent); }
+  .panel .knob { fill: var(--accent); }
+
+  /* Step 2: loops you only imagine — faint, breathing */
+  .imagined path {
+    stroke: var(--accent);
+    stroke-width: 1.3;
+    stroke-dasharray: 3 6;
+    opacity: 0.25;
+    animation: imagine 3.2s ease-in-out infinite paused;
+  }
+  /* Step 3: the one loop you commit to, drawn in and repeated */
+  .drawn .vis {
+    stroke: var(--accent);
+    stroke-width: 2.4;
+    stroke-dasharray: 1;
+    stroke-dashoffset: 1;
+    animation: draw-loop 5s cubic-bezier(0.6, 0, 0.3, 1) infinite both paused;
+  }
+  .drawn .hid {
+    stroke: var(--accent);
+    stroke-width: 1.6;
+    stroke-dasharray: 4 5;
+    opacity: 0;
+    animation: show-hidden 5s ease infinite both paused;
+  }
+  .timeline:global(.in-view) .imagined path,
+  .timeline:global(.in-view) .drawn path { animation-play-state: running; }
+
+  @keyframes imagine {
+    0%, 100% { opacity: 0.15; }
+    50% { opacity: 0.6; }
+  }
+  @keyframes draw-loop {
+    0% { stroke-dashoffset: 1; }
+    30%, 76% { stroke-dashoffset: 0; }
+    94%, 100% { stroke-dashoffset: -1; }
+  }
+  @keyframes show-hidden {
+    0%, 24% { opacity: 0; }
+    36%, 72% { opacity: 0.55; }
+    86%, 100% { opacity: 0; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .imagined path { animation: none; opacity: 0.4; }
+    .drawn .vis { animation: none; stroke-dashoffset: 0; }
+    .drawn .hid { animation: none; opacity: 0.55; }
+  }
+</style>

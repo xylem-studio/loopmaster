@@ -132,9 +132,11 @@ export function sphere(): FormDrawing {
   };
 }
 
-export function cylinder(): FormDrawing {
+// Cylinder pieces, reusable for instruction diagrams: the form, any loop, and the
+// "wrong" flat chord across it (a straight line that ignores the curvature).
+export function cylinderKit(tilt = 0.42, roll = 0.25, scale = 52) {
   const H = 1.25;
-  const { R, facing, curve } = drawer(0.42, 0.25, 52);
+  const { R, facing, curve } = drawer(tilt, roll, scale);
   const rim = (y: number, capNormal: V3) =>
     curve(ring(120).map((t) => {
       const n: V3 = [Math.cos(t), 0, Math.sin(t)];
@@ -145,19 +147,27 @@ export function cylinder(): FormDrawing {
   // Silhouette where the side normal is perpendicular to the view: A cos t + B sin t = 0.
   const A = R([1, 0, 0])[2], B = R([0, 0, 1])[2];
   const t0 = Math.atan2(-A, B);
+  const edge = (t: number, y: number): V3 => [Math.cos(t), y, Math.sin(t)];
   const sil = [t0, t0 + Math.PI].flatMap((t) =>
-    curve([{ p: [Math.cos(t), -H, Math.sin(t)], front: true }, { p: [Math.cos(t), H, Math.sin(t)], front: true }]).vis,
+    curve([{ p: edge(t, -H), front: true }, { p: edge(t, H), front: true }]).vis,
   );
   const loop = (y: number) =>
     curve(ring(120).map((t) => {
       const n: V3 = [Math.cos(t), 0, Math.sin(t)];
       return { p: [n[0], y, n[2]], front: facing(n) };
     }));
+  const chord = (y: number) => curve([{ p: edge(t0, y), front: true }, { p: edge(t0 + Math.PI, y), front: true }]).vis[0];
   return {
     shape: [...top.vis, ...top.hid, ...bottom.vis, ...sil],
     shapeHidden: bottom.hid,
-    loops: [loop(0.75), loop(0.25), loop(-0.25), loop(-0.75)],
+    loop,
+    chord,
   };
+}
+
+export function cylinder(): FormDrawing {
+  const k = cylinderKit();
+  return { shape: k.shape, shapeHidden: k.shapeHidden, loops: [0.75, 0.25, -0.25, -0.75].map(k.loop) };
 }
 
 export function cone(): FormDrawing {

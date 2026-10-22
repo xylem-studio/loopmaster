@@ -1,0 +1,156 @@
+---
+// The four drawing tips as "do / don't" cards with vector diagrams.
+import { cylinderKit, VIEWBOX } from '../lib/forms';
+
+const big = cylinderKit();
+const small = cylinderKit(0.42, 0.25, 30);
+const days = ['M', 'T', 'W', 'T', 'F', 'S', 'S'];
+const done = [true, true, false, true, true, true, false];
+// Drawn marks (font glyphs for ✓ / ✗ are unreliable at small SVG sizes).
+const OK = 'M-8 0L-2.5 6L9 -7';
+const NO = 'M-7 -7L7 7M7 -7L-7 7';
+---
+
+<section class="section wrap tips" aria-labelledby="tips-title">
+  <div class="head">
+    <p class="label">Tips</p>
+    <h2 id="tips-title">Tips for Drawing Cross Contour Lines</h2>
+  </div>
+
+  <ul class="cards">
+    <li class="card">
+      <svg viewBox={VIEWBOX} aria-hidden="true">
+        <g class="shape">{big.shape.map((d) => <path d={d} />)}</g>
+        <g class="hidden-lines">{big.shapeHidden.map((d) => <path d={d} />)}</g>
+        {[0.5, -0.4].map((y) => {
+          const l = big.loop(y);
+          return (
+            <g>
+              {l.vis.map((d) => <path class="seen" d={d} />)}
+              {l.hid.map((d) => <path class="unseen" d={d} />)}
+            </g>
+          );
+        })}
+      </svg>
+      <h3>Visualize the full form</h3>
+      <p>
+        Even if you’re only drawing the visible cross contour lines, mentally visualize the entire form, including
+        the hidden lines. This helps in creating a more accurate and convincing depiction.
+      </p>
+    </li>
+
+    <li class="card">
+      <svg viewBox={VIEWBOX} aria-hidden="true">
+        {[
+          { dx: -46, full: false },
+          { dx: 46, full: true },
+        ].map(({ dx, full }) => {
+          const l = small.loop(0);
+          return (
+            <g transform={`translate(${dx} 0)`}>
+              <g class="shape">{small.shape.map((d) => <path d={d} />)}</g>
+              <g class="hidden-lines">{small.shapeHidden.map((d) => <path d={d} />)}</g>
+              {l.vis.map((d) => <path class={full ? 'good' : 'bad'} d={d} />)}
+              {full && l.hid.map((d) => <path class="good hid" d={d} />)}
+              <path class:list={['mark', full ? 'ok' : 'no']} transform="translate(100 186)" d={full ? OK : NO} />
+            </g>
+          );
+        })}
+      </svg>
+      <h3>Draw complete contour lines</h3>
+      <p>
+        Practice drawing the full contour lines around the object, not just the visible parts. This will help you
+        understand the form better and improve your ability to visualize 3D shapes.
+      </p>
+    </li>
+
+    <li class="card">
+      <svg viewBox={VIEWBOX} aria-hidden="true">
+        <g class="shape">{big.shape.map((d) => <path d={d} />)}</g>
+        <g class="hidden-lines">{big.shapeHidden.map((d) => <path d={d} />)}</g>
+        {big.loop(0.35).vis.map((d) => <path class="good" d={d} />)}
+        <path class="bad" d={big.chord(-0.45)} />
+        <path class="mark ok" transform="translate(176 76)" d={OK} />
+        <path class="mark no" transform="translate(176 140)" d={NO} />
+      </svg>
+      <h3>Hug the shape</h3>
+      <p>
+        When drawing visible cross contour lines, make sure they “hug” the shape, following its curves and contours
+        closely. Avoid drawing straight lines; instead, let the lines wrap around the form to convey depth and
+        volume.
+      </p>
+    </li>
+
+    <li class="card">
+      <svg viewBox={VIEWBOX} aria-hidden="true">
+        {days.map((d, i) => (
+          <g transform={`translate(${12 + i * 26} 70)`}>
+            <rect class:list={['day', { on: done[i] }]} width="22" height="22" rx="5" />
+            {done[i] && <path class="tick" d="M5.5 11.5L9.5 15.5L17 7" />}
+            <text x="11" y="40">{d}</text>
+          </g>
+        ))}
+        <text class="streak" x="100" y="146">5 / 7 DAYS</text>
+      </svg>
+      <h3>Consistency is key</h3>
+      <p>
+        Make drawing cross contour lines a regular part of your practice routine. Consistency will help you develop
+        a stronger understanding of form and improve your overall drawing skills.
+      </p>
+    </li>
+  </ul>
+</section>
+
+<style>
+  .tips { padding-top: 0; }
+  .head { max-width: 640px; }
+  .cards {
+    list-style: none;
+    margin: 40px 0 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 20px;
+  }
+  @media (max-width: 760px) { .cards { grid-template-columns: minmax(0, 1fr); } }
+
+  .card {
+    display: grid;
+    grid-template-columns: minmax(120px, 200px) minmax(0, 1fr);
+    grid-template-rows: auto 1fr;
+    column-gap: 24px;
+    padding: 24px;
+    background: var(--ink-2);
+    border: 1px solid var(--line-dim);
+    border-radius: var(--radius);
+  }
+  .card svg { grid-row: 1 / 3; width: 100%; aspect-ratio: 1; align-self: center; }
+  .card h3 { margin: 4px 0 8px; }
+  .card p { margin: 0; font-size: 0.9375rem; color: var(--muted); }
+  @media (max-width: 480px) {
+    .card { grid-template-columns: minmax(0, 1fr); }
+    .card svg { grid-row: auto; max-width: 220px; margin-bottom: 12px; }
+  }
+
+  svg path { fill: none; stroke-linecap: round; stroke-linejoin: round; }
+  .shape path { stroke: var(--line); stroke-width: 1.6; }
+  .hidden-lines path { stroke: var(--line); stroke-width: 1.2; stroke-dasharray: 4 5; opacity: 0.35; }
+
+  /* Visualize: the visible half is quiet, the hidden half is the point. */
+  .seen { stroke: var(--muted); stroke-width: 1.6; }
+  .unseen { stroke: var(--accent); stroke-width: 2.2; stroke-dasharray: 5 5; }
+
+  .good { stroke: var(--accent); stroke-width: 2.4; }
+  .good.hid { stroke-width: 1.8; stroke-dasharray: 4 5; opacity: 0.7; }
+  .bad { stroke: var(--muted); stroke-width: 2.2; opacity: 0.8; }
+
+  .mark { fill: none; stroke-width: 3.2; stroke-linecap: round; stroke-linejoin: round; }
+  .mark.ok { stroke: var(--accent); }
+  .mark.no { stroke: var(--muted); }
+
+  .day { fill: none; stroke: var(--line-dim); stroke-width: 1.4; }
+  .day.on { fill: var(--accent); stroke: var(--accent); }
+  .tick { stroke: var(--ink); stroke-width: 2.4; }
+  svg text { fill: var(--muted); font-family: var(--font-mono); font-size: 12px; text-anchor: middle; }
+  .streak { fill: var(--accent); font-size: 14px; letter-spacing: 0.12em; }
+</style>
