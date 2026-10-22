@@ -1,0 +1,72 @@
+---
+import { Image } from 'astro:assets';
+import Base from '../layouts/Base.astro';
+import studies from '../assets/img/practice-7.jpg';
+---
+
+<Base title="About" description="Why Loop Master exists: a dedicated place to practice cross-contour lines.">
+  <section class="page wrap about">
+    <div class="prose">
+      <p class="label">About us</p>
+      <h1 class="title">Mission and Offerings</h1>
+
+      <h2>What We Offer</h2>
+      <p>LoopMaster provides a simple yet powerful platform that includes:</p>
+      <ul>
+        <li>
+          <strong>Customizable Practice Sessions:</strong> Set the number of images and timer for your practice
+          session to suit your needs.
+        </li>
+        <li>
+          <strong>Feedback Options:</strong> Opt for immediate feedback after each drawing to quickly correct
+          mistakes or receive a comprehensive review at the end of the session to see your overall progress.
+        </li>
+        <li>
+          <strong>New Shapes for Every Practice:</strong> Every time you practice, a new image of shapes is
+          generated just for you from our exclusive 3D assets, ensuring a unique experience that allows you to
+          explore and refine your artistic skills.
+        </li>
+      </ul>
+
+      <h2>Our Mission</h2>
+      <p>
+        At LoopMaster, our mission is to help artists develop a deeper understanding of form and structure
+        through consistent practice. We believe that consistency is the key to success, and our platform is
+        designed to facilitate regular, focused practice sessions that enhance your ability to visualize and
+        construct 3D shapes effectively.
+      </p>
+
+      <h2>Our Inspiration</h2>
+      <p>
+        As artists, we saw a gap in resources for practicing 3D form construction. While many platforms focus on
+        gesture drawing and basic shapes, few cater to <strong>cross-contour line drawing</strong>, essential for
+        visualizing three-dimensional structures. Our daily practice revealed the need for a dedicated platform
+        that combines structure and flexibility, enabling artists to enhance their skills effectively.
+      </p>
+
+      <p class="signoff">Thank you for choosing LoopMaster.</p>
+      <p>
+        Let's draw the cross-contour line or loops and unlock the full potential of your illustrations together!
+      </p>
+      <a class="btn" href="/practice/">Start Practicing</a>
+    </div>
+    <Image class="side" src={studies} alt="An artist draws a torus with cross-contour loops while referencing a tablet" widths={[400, 720]} sizes="(max-width: 860px) 100vw, 380px" />
+  </section>
+  <div class="section"></div>
+</Base>
+
+<style>
+  .title { font-size: clamp(2.5rem, 7vw, 5rem); }
+  .about {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 380px);
+    gap: clamp(32px, 6vw, 96px);
+    align-items: start;
+  }
+  .side { width: 100%; border-radius: var(--radius); position: sticky; top: 32px; margin-top: 140px; }
+  .signoff { font-family: var(--font-display); font-size: var(--step-2); text-transform: uppercase; color: var(--accent); margin-top: 2em; }
+  @media (max-width: 860px) {
+    .about { grid-template-columns: minmax(0, 1fr); }
+    .side { position: static; margin-top: 0; max-width: 420px; }
+  }
+</style>

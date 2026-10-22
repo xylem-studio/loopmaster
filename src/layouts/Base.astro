@@ -1,0 +1,138 @@
+---
+import '@fontsource-variable/montserrat';
+import '@fontsource/jetbrains-mono/400.css';
+import '@fontsource/jetbrains-mono/500.css';
+import '../styles/global.css';
+import { Image } from 'astro:assets';
+import logo from '../assets/img/home-19.png';
+
+interface Props {
+  title?: string;
+  description?: string;
+}
+
+const {
+  title,
+  description = 'Practice drawing cross-contour lines on generated 3D forms. Free, no sign-in.',
+} = Astro.props;
+const fullTitle = title ? `${title} – Loop Master` : 'Loop Master – Draw the Unseen';
+const path = Astro.url.pathname.replace(/\/$/, '') || '/';
+const nav = [
+  { href: '/', label: 'Home' },
+  { href: '/practice/', label: 'Practice' },
+  { href: '/about/', label: 'About' },
+  { href: '/contact/', label: 'Contact' },
+];
+const isCurrent = (href: string) => (href === '/' ? path === '/' : path === href.replace(/\/$/, ''));
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{fullTitle}</title>
+    <meta name="description" content={description} />
+    <meta name="theme-color" content="#000f07" />
+    <link rel="canonical" href={new URL(Astro.url.pathname, Astro.site)} />
+    <link rel="icon" type="image/png" href="/favicon.png" />
+    <link rel="preload" href="/fonts/unseen.woff2" as="font" type="font/woff2" crossorigin />
+    <meta property="og:title" content={fullTitle} />
+    <meta property="og:description" content={description} />
+    <meta property="og:type" content="website" />
+  </head>
+  <body>
+    <a class="skip-link btn" href="#main">Skip to content</a>
+    <header class="site-header">
+      <div class="wrap bar">
+        <a href="/" class="brand" aria-label="Loop Master home">
+          <Image src={logo} alt="" width={260} densities={[1, 2]} loading="eager" />
+        </a>
+        <nav aria-label="Primary">
+          <ul>
+            {nav.map((item) => (
+              <li>
+                <a href={item.href} aria-current={isCurrent(item.href) ? 'page' : undefined}>{item.label}</a>
+              </li>
+            ))}
+          </ul>
+        </nav>
+      </div>
+    </header>
+
+    <main id="main">
+      <slot />
+    </main>
+
+    <footer class="site-footer">
+      <div class="wrap foot">
+        <nav aria-label="Footer">
+          <ul>
+            <li><a href="/practice/">Practice</a></li>
+            <li><a href="/about/">About</a></li>
+            <li><a href="/contact/">Contact</a></li>
+            <li><a href="/terms/">Terms and Privacy Policy</a></li>
+          </ul>
+        </nav>
+        <p class="label">Copyright © {new Date().getFullYear()} Loop Master</p>
+      </div>
+    </footer>
+  </body>
+</html>
+
+<style>
+  .site-header {
+    position: absolute;
+    inset: 0 0 auto;
+    z-index: 10;
+  }
+  .bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding-block: 20px;
+  }
+  .brand img { width: clamp(200px, 22vw, 260px); }
+  nav ul {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px 24px;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+  .bar nav a {
+    font-family: var(--font-mono);
+    font-size: 0.8125rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    text-decoration: none;
+    color: var(--line);
+    padding-block: 6px;
+    border-bottom: 1px solid transparent;
+  }
+  .bar nav a:hover { color: var(--accent); }
+  .bar nav a[aria-current='page'] { color: var(--accent); border-bottom-color: var(--accent); }
+
+  @media (max-width: 560px) {
+    .bar { flex-direction: column; align-items: flex-start; gap: 8px; }
+    .brand img { width: 200px; }
+    nav ul { gap: 4px 18px; }
+  }
+
+  .site-footer {
+    border-top: 1px solid var(--line-dim);
+    padding-block: 40px;
+  }
+  .foot {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+  }
+  .foot a { color: var(--muted); text-decoration: none; font-size: 0.9375rem; }
+  .foot a:hover { color: var(--accent); }
+  .foot p { margin: 0; }
+</style>

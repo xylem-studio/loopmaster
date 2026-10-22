@@ -1,0 +1,77 @@
+---
+---
+
+<section class="section try" id="try" aria-labelledby="try-title">
+  <div class="wrap grid">
+    <div class="copy">
+      <p class="label">Try it · one loop</p>
+      <h2 id="try-title">Wrap the form</h2>
+      <p>
+        A cross-contour loop is the line a slice through the form would leave on its surface. Draw one around
+        the middle of this cylinder, including the half that turns away from you. Then compare it with the real
+        one.
+      </p>
+      <p class="muted">Solid lines are the parts you can see. Dashed lines are hidden behind the form.</p>
+      <div class="actions">
+        <button class="btn btn--ghost" type="button" data-action="clear">Clear</button>
+        <button class="btn btn--ghost" type="button" data-action="new">New angle</button>
+        <button class="btn btn--ghost" type="button" data-action="reveal">Show the loop</button>
+      </div>
+    </div>
+    <figure class="pad">
+      <canvas aria-label="Drawing area: a tilted cylinder. Drag to draw a loop around its middle."></canvas>
+      <figcaption data-result aria-live="polite"></figcaption>
+    </figure>
+  </div>
+</section>
+
+<script>
+  import { mountTryLoop } from '../scripts/try-loop';
+  const root = document.getElementById('try');
+  if (root) mountTryLoop(root);
+</script>
+
+<style>
+  .try { border-top: 1px solid var(--line-dim); }
+  .grid {
+    display: grid;
+    grid-template-columns: minmax(0, 5fr) minmax(0, 6fr);
+    gap: clamp(32px, 5vw, 72px);
+    align-items: center;
+  }
+  @media (max-width: 860px) {
+    .grid { grid-template-columns: minmax(0, 1fr); }
+  }
+  .actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 24px; }
+  .actions .btn { font-size: 0.75rem; padding: 0.7em 1.1em; }
+
+  .pad { margin: 0; }
+  canvas {
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    max-height: 72svh;
+    border-radius: var(--radius);
+    background: var(--ink-2);
+    box-shadow: 0 0 0 1px var(--line-dim); /* not a border: keeps pointer coords aligned */
+    touch-action: none;
+    cursor: crosshair;
+  }
+  figcaption {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 4px 6px;
+    min-height: 4.5em;
+    padding-top: 14px;
+    color: var(--muted);
+  }
+  figcaption :global(.score) {
+    font-family: var(--font-display);
+    font-size: 2.5rem;
+    line-height: 1;
+    color: var(--accent);
+  }
+  figcaption :global(.stats) { flex-basis: 100%; }
+  figcaption :global(.note) { flex-basis: 100%; color: var(--line); }
+  figcaption :global(strong) { color: var(--accent); font-weight: 600; }
+</style>

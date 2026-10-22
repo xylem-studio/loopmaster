@@ -1,0 +1,51 @@
+---
+import Base from '../layouts/Base.astro';
+const email = 'zinnia_art@proton.me';
+---
+
+<Base title="Terms and Privacy Policy" description="Loop Master terms of use and privacy policy.">
+  <section class="page wrap">
+    <div class="prose">
+      <p class="label">Legal</p>
+      <h1 class="title">Terms and Privacy Policy</h1>
+
+      <h2>Who we are</h2>
+      <p>
+        Loop Master is a free online tool designed to help you practice drawing loops and cross contour lines on
+        various shapes. No sign-in or personal information is required to start creating!
+      </p>
+
+      <h2>Terms and Conditions</h2>
+      <p>By using Loop Master, you agree to the following terms:</p>
+      <ul>
+        <li><strong>Use of the Tool:</strong> Loop Master is for personal use only. You may not use it for commercial purposes.</li>
+        <li><strong>Content Ownership:</strong> All content created using Loop Master remains your property, but we reserve the right to use anonymized data to improve our service.</li>
+        <li><strong>User Conduct:</strong> You agree not to upload, share, or create content that is unlawful, harmful, or otherwise objectionable.</li>
+        <li><strong>Limitations of Liability:</strong> Loop Master is provided “as is.” We are not responsible for any damages resulting from the use of the tool.</li>
+        <li><strong>Modifications:</strong> We may update these terms at any time. Changes will be posted on this page.</li>
+      </ul>
+
+      <h2>Privacy Policy</h2>
+      <p>Loop Master is committed to protecting your privacy. Here’s how we handle your data:</p>
+      <ul>
+        <li><strong>No Personal Data Collection:</strong> We do not require any personal information to use Loop Master. No sign-in is needed.</li>
+        <li><strong>Cookies:</strong> We may use cookies to enhance your experience. You can choose to accept or decline cookies through your browser settings.</li>
+        <li><strong>Data Usage:</strong> Any data collected (e.g., usage statistics) is anonymized and used solely to improve Loop Master.</li>
+        <li><strong>Third-Party Services:</strong> Loop Master does not share your data with third-party services without your explicit consent.</li>
+        <li><strong>Changes to Privacy Policy:</strong> We may update our privacy policy. Any changes will be reflected on this page.</li>
+      </ul>
+
+      <h2>Contact Us</h2>
+      <p>
+        If you have questions about our terms and privacy policy, please reach out to us at
+        <a href={`mailto:${email}`}>{email}</a>.
+      </p>
+      <p>Enjoy your drawing practice!</p>
+    </div>
+  </section>
+  <div class="section"></div>
+</Base>
+
+<style>
+  .title { font-size: clamp(2.25rem, 6vw, 4rem); }
+</style>

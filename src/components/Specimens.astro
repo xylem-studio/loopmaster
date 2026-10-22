@@ -1,0 +1,179 @@
+---
+import { cube, sphere, cylinder, cone, VIEWBOX, type FormDrawing } from '../lib/forms';
+
+const specimens: { name: string; tip: string; form: FormDrawing }[] = [
+  { name: 'Cube', tip: 'Loops on a box are its sections: straight on each face, turning at every edge.', form: cube() },
+  { name: 'Sphere', tip: 'Every loop is an ellipse. They thin out as they approach the silhouette.', form: sphere() },
+  { name: 'Cylinder', tip: 'Keep each loop parallel to the end caps, not to the page.', form: cylinder() },
+  { name: 'Cone', tip: 'Loops shrink toward the tip but keep the tilt of the base.', form: cone() },
+];
+---
+
+<section class="section specimens" aria-labelledby="spec-title">
+  <div class="wrap head">
+    <span class="num" aria-hidden="true">02</span>
+    <div class="intro">
+      <p class="label">Fundamentals</p>
+      <h2 id="spec-title">Start Simple, Master Complex</h2>
+      <p>
+        Understanding and drawing complex shapes begins with mastering simple forms. By using this tool, you'll
+        gain a deeper understanding of form from the inside, improving your ability to visualize and create 3D
+        structures.
+      </p>
+    </div>
+    <div class="nav" aria-hidden="true">
+      <button class="btn btn--ghost" type="button" data-dir="-1" tabindex="-1">←</button>
+      <button class="btn btn--ghost" type="button" data-dir="1" tabindex="-1">→</button>
+    </div>
+  </div>
+
+  <ol class="strip" tabindex="0" aria-label="Basic forms with their cross-contour loops">
+    {specimens.map((s, i) => (
+      <li class="card">
+        <svg viewBox={VIEWBOX} role="img" aria-label={`${s.name} with cross-contour loops`}>
+          <g class="hidden-lines">
+            {s.form.shapeHidden.map((d) => <path d={d} />)}
+          </g>
+          <g class="shape">
+            {s.form.shape.map((d) => <path d={d} />)}
+          </g>
+          {s.form.loops.map((l, k) => (
+            <g class="loop" style={`--d:${0.25 + k * 0.18}s`}>
+              {l.hid.map((d) => <path class="hid" d={d} />)}
+              {l.vis.map((d) => <path class="vis" d={d} pathLength="1" />)}
+            </g>
+          ))}
+        </svg>
+        <p class="label">{String(i + 1).padStart(2, '0')} / {s.name}</p>
+        <p class="tip">{s.tip}</p>
+      </li>
+    ))}
+    <li class="card card--cta">
+      <p class="label">05 / Anything</p>
+      <p class="tip">Then the same thinking on generated forms, against the clock.</p>
+      <a class="btn" href="/practice/">Start Drawing</a>
+    </li>
+  </ol>
+</section>
+
+<script>
+  const strip = document.querySelector<HTMLElement>('.specimens .strip');
+  if (strip) {
+    const io = new IntersectionObserver(
+      (entries) => {
+        for (const e of entries) {
+          // Pause off-screen cards so the loops don't burn CPU out of view.
+          e.target.classList.toggle('in-view', e.isIntersecting);
+        }
+      },
+      { threshold: 0.3 },
+    );
+    strip.querySelectorAll('.card').forEach((c) => io.observe(c));
+
+    document.querySelectorAll<HTMLButtonElement>('.specimens [data-dir]').forEach((b) =>
+      b.addEventListener('click', () => {
+        const card = strip.querySelector<HTMLElement>('.card');
+        strip.scrollBy({ left: Number(b.dataset.dir) * ((card?.offsetWidth ?? 300) + 20), behavior: 'smooth' });
+      }),
+    );
+  }
+</script>
+
+<style>
+  .specimens {
+    border-top: 1px solid var(--line-dim);
+    overflow: hidden;
+  }
+  .head {
+    position: relative;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: end;
+    gap: 24px;
+  }
+  .intro { position: relative; max-width: 620px; padding-top: clamp(40px, 8vw, 96px); }
+  .num {
+    position: absolute;
+    top: -0.12em;
+    right: var(--gutter);
+    font-family: var(--font-display);
+    font-size: clamp(8rem, 26vw, 22rem);
+    line-height: 0.8;
+    color: transparent;
+    -webkit-text-stroke: 1.5px var(--line-dim);
+    pointer-events: none;
+    user-select: none;
+  }
+  .nav { display: flex; gap: 8px; position: relative; }
+  .nav .btn { padding: 0.6em 1em; }
+  @media (max-width: 640px) { .nav { display: none; } }
+
+  .strip {
+    list-style: none;
+    margin: 40px 0 0;
+    padding: 4px max(var(--gutter), calc((100vw - var(--max)) / 2 + var(--gutter))) 24px;
+    display: grid;
+    grid-auto-flow: column;
+    grid-auto-columns: minmax(260px, 330px);
+    gap: 20px;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scroll-padding-inline: max(var(--gutter), calc((100vw - var(--max)) / 2 + var(--gutter)));
+    scrollbar-width: thin;
+    scrollbar-color: var(--line-dim) transparent;
+  }
+  .card {
+    scroll-snap-align: start;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 20px;
+    background: var(--ink-2);
+    border: 1px solid var(--line-dim);
+    border-radius: var(--radius);
+  }
+  .card svg { width: 100%; aspect-ratio: 1; overflow: visible; }
+  .card .label { margin: 8px 0 0; color: var(--accent); }
+  .tip { margin: 0; font-size: 0.9375rem; color: var(--muted); }
+
+  .card--cta { justify-content: flex-end; align-items: flex-start; border-style: dashed; }
+  .card--cta .tip { color: var(--line); font-size: var(--step-1); line-height: 1.35; margin-bottom: 12px; }
+
+  svg path { fill: none; stroke-linecap: round; stroke-linejoin: round; }
+  .shape path { stroke: var(--line); stroke-width: 1.6; }
+  .hidden-lines path { stroke: var(--line); stroke-width: 1.2; stroke-dasharray: 4 5; opacity: 0.35; }
+
+  /* Loops draw in, hold, erase and repeat while the card is on screen. */
+  .loop .vis {
+    stroke: var(--accent);
+    stroke-width: 2.2;
+    stroke-dasharray: 1;
+    stroke-dashoffset: 1;
+    animation: draw-loop 6s cubic-bezier(0.6, 0, 0.3, 1) var(--d) infinite both paused;
+  }
+  .loop .hid {
+    stroke: var(--accent);
+    stroke-width: 1.6;
+    stroke-dasharray: 4 5;
+    opacity: 0;
+    animation: show-hidden 6s ease var(--d) infinite both paused;
+  }
+  .card:global(.in-view) .loop .vis,
+  .card:global(.in-view) .loop .hid { animation-play-state: running; }
+
+  @keyframes draw-loop {
+    0% { stroke-dashoffset: 1; }
+    28%, 74% { stroke-dashoffset: 0; }
+    92%, 100% { stroke-dashoffset: -1; }
+  }
+  @keyframes show-hidden {
+    0%, 22% { opacity: 0; }
+    34%, 70% { opacity: 0.55; }
+    84%, 100% { opacity: 0; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .loop .vis { animation: none; stroke-dashoffset: 0; }
+    .loop .hid { animation: none; opacity: 0.55; }
+  }
+</style>

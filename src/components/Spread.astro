@@ -1,0 +1,123 @@
+---
+// Editorial "broken grid" section: the image bleeds off one edge of the page,
+// the heading overlaps it (inverted with a difference blend), a giant outline
+// number sits behind, and the caption runs vertically along the image.
+import { Image } from 'astro:assets';
+import type { ImageMetadata } from 'astro';
+
+interface Props {
+  num: string;
+  label: string;
+  title: string;
+  image: ImageMetadata;
+  alt: string;
+  caption: string;
+  side?: 'right' | 'left'; // where the image bleeds
+  ratio?: string;
+  cta?: { href: string; text: string };
+}
+const { num, label, title, image, alt, caption, side = 'right', ratio = '4 / 5', cta } = Astro.props;
+---
+
+<section class:list={['spread', `spread--${side}`]}>
+  <span class="num" aria-hidden="true">{num}</span>
+  <figure class="media" style={`--ratio:${ratio}`}>
+    <Image src={image} alt={alt} widths={[480, 800, 1024]} sizes="(max-width: 860px) 100vw, 60vw" />
+    <figcaption class="label">{caption}</figcaption>
+  </figure>
+  <div class="copy">
+    <p class="label">{label}</p>
+    <h2>{title}</h2>
+    <div class="body"><slot /></div>
+    {cta && <a class="btn" href={cta.href}>{cta.text}</a>}
+  </div>
+</section>
+
+<style>
+  .spread {
+    position: relative;
+    display: grid;
+    grid-template-columns: [full-start] minmax(var(--gutter), 1fr) [content-start] repeat(12, minmax(0, calc((var(--max) - 2 * var(--gutter)) / 12))) [content-end] minmax(var(--gutter), 1fr) [full-end];
+    align-items: center;
+    padding-block: clamp(72px, 12vw, 160px);
+    border-top: 1px solid var(--line-dim);
+    overflow: hidden;
+  }
+
+  .num {
+    position: absolute;
+    top: clamp(24px, 4vw, 48px);
+    font-family: var(--font-display);
+    font-size: clamp(8rem, 26vw, 22rem);
+    line-height: 0.8;
+    color: transparent;
+    -webkit-text-stroke: 1.5px var(--line-dim);
+    pointer-events: none;
+    user-select: none;
+  }
+
+  .media {
+    position: relative;
+    margin: 0;
+    grid-row: 1;
+  }
+  .media :global(img) {
+    width: 100%;
+    aspect-ratio: var(--ratio);
+    object-fit: cover;
+    /* Fade the edge that faces the text into the page, so photo and copy share one dark ground. */
+    --fade-v: linear-gradient(to bottom, transparent 0%, #000 12%, #000 88%, transparent 100%);
+    -webkit-mask-image: var(--fade), var(--fade-v);
+    -webkit-mask-composite: source-in;
+    mask-image: var(--fade), var(--fade-v);
+    mask-composite: intersect;
+  }
+  .spread--right .media { --fade: linear-gradient(to right, transparent 0%, #000 38%); }
+  .spread--left .media { --fade: linear-gradient(to left, transparent 0%, #000 38%); }
+  figcaption {
+    position: absolute;
+    bottom: 0;
+    writing-mode: vertical-rl;
+    white-space: nowrap;
+  }
+
+  .copy {
+    position: relative;
+    z-index: 1;
+    grid-row: 1;
+  }
+  h2 {
+    font-size: clamp(2.5rem, 6.4vw, 6rem);
+    color: #fff;
+    mix-blend-mode: difference;
+  }
+  .body { max-width: 36ch; }
+  .body :global(p) { margin-bottom: 1.2em; }
+
+  /* Image bleeds off the right edge, copy on the left overlapping it. */
+  .spread--right .num { left: var(--gutter); }
+  .spread--right .media { grid-column: 8 / full-end; }
+  .spread--right figcaption { left: -28px; rotate: 180deg; }
+  .spread--right .copy { grid-column: content-start / 11; }
+
+  /* Mirror: image bleeds off the left edge. */
+  .spread--left .num { right: var(--gutter); }
+  .spread--left .media { grid-column: full-start / 7; }
+  .spread--left figcaption { position: static; writing-mode: horizontal-tb; padding: 12px var(--gutter) 0; }
+  .spread--left .copy { grid-column: 6 / content-end; text-align: right; }
+  .spread--left .body { margin-left: auto; }
+
+  @media (max-width: 860px) {
+    .spread { align-items: start; }
+    .spread--right .media,
+    .spread--left .media { grid-column: full-start / full-end; margin-top: clamp(64px, 18vw, 120px); }
+    .spread--right .copy,
+    .spread--left .copy { grid-column: content-start / content-end; grid-row: 2; margin-top: 20px; text-align: left; }
+    .spread--left .body { margin-left: 0; }
+    figcaption { display: none; }
+    /* Stacked on phones: fade the bottom edge into the heading instead. */
+    .spread--right .media,
+    .spread--left .media { --fade: linear-gradient(to top, transparent 0%, #000 30%); }
+    .media :global(img) { --fade-v: linear-gradient(#000, #000); }
+  }
+</style>

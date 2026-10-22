@@ -1,0 +1,120 @@
+---
+---
+
+<section class="hero" aria-labelledby="hero-title">
+  <canvas class="hero-canvas" aria-hidden="true"></canvas>
+  <div class="scrim" aria-hidden="true"></div>
+  <div class="wrap hero-copy">
+    <!-- The city is drawn in hidden-line style behind this block (the "unseen zone"). -->
+    <div class="copy-block">
+      <p class="label">Cross-contour drawing practice</p>
+      <h1 id="hero-title"><span class="solid">Draw</span> <span class="hollow">the Unseen</span></h1>
+      <p class="lede">
+        Every form has a back side you can't see. Wrap it in loops until you can.
+      </p>
+      <div class="ctas">
+        <a class="btn" href="/practice/">Start Practicing</a>
+        <a class="btn btn--ghost" href="#try">Try one loop</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+  const canvas = document.querySelector<HTMLCanvasElement>('.hero-canvas');
+  const zone = document.querySelector<HTMLElement>('.hero .copy-block');
+  const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  function boot() {
+    if (!canvas) return;
+    import('../scripts/hero-city')
+      .then(({ mountHeroCity }) => {
+        if (mountHeroCity(canvas, { reducedMotion, zone })) {
+          requestAnimationFrame(() => canvas.classList.add('is-ready'));
+        }
+      })
+      .catch(() => {}); // keep the static fallback
+  }
+
+  // Wait for first paint, then idle time, before pulling in three.js.
+  const idle = (cb: () => void) =>
+    'requestIdleCallback' in window ? requestIdleCallback(cb, { timeout: 1500 }) : setTimeout(cb, 200);
+  if (document.readyState === 'complete') idle(boot);
+  else window.addEventListener('load', () => idle(boot), { once: true });
+</script>
+
+<style>
+  .hero {
+    position: relative;
+    min-height: max(560px, 100svh);
+    display: flex;
+    align-items: flex-end;
+    overflow: hidden;
+    isolation: isolate;
+    /* Shown until (or instead of) the WebGL canvas: a pre-rendered still of the
+       same city at the same starting angle, so the hand-off is seamless. */
+    background: var(--ink) url('/hero/city-still.webp') center / cover no-repeat;
+  }
+  @media (max-aspect-ratio: 11 / 10) {
+    .hero { background-size: auto 100%; }
+  }
+  .hero-canvas {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+    opacity: 0;
+    transition: opacity 1.2s ease;
+  }
+  .hero-canvas:global(.is-ready) { opacity: 1; }
+
+  .scrim {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    /* Soft fade from the left edge and into the next section; the unseen zone does the rest. */
+    background:
+      linear-gradient(90deg, rgb(0 15 7 / 0.5) 0%, transparent 50%),
+      linear-gradient(to top, var(--ink) 0%, transparent 20%);
+  }
+
+  .hero-copy { padding-block: 160px clamp(48px, 9vh, 96px); }
+  .copy-block { width: fit-content; max-width: 100%; }
+
+  h1 {
+    font-size: min(clamp(3.5rem, 10.5vw, 9.5rem), 13vw); /* "THE UNSEEN" stays on one line */
+    margin-bottom: 0.25em;
+    line-height: 0.92;
+  }
+  h1 span { display: block; }
+  /* Solid next to hollow: what you see, and what you have to imagine. */
+  .solid { -webkit-text-stroke: 0.035em currentColor; }
+  .hollow { color: var(--accent); }
+  @supports (-webkit-text-stroke: 1px black) {
+    .hollow {
+      color: transparent;
+      -webkit-text-stroke: clamp(1.5px, 0.22vw, 3px) var(--accent);
+    }
+  }
+  .lede {
+    font-size: var(--step-1);
+    color: var(--line);
+    max-width: 34ch;
+  }
+  .ctas {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-top: 28px;
+  }
+
+  /* Phones: centred near the bottom, city above. */
+  @media (max-aspect-ratio: 11 / 10) {
+    .scrim { background: linear-gradient(to top, var(--ink) 0%, rgb(0 15 7 / 0.4) 45%, transparent 70%); }
+    .copy-block { margin-inline: auto; text-align: center; }
+    .lede { margin-inline: auto; }
+    .ctas { justify-content: center; }
+  }
+</style>

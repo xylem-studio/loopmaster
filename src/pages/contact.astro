@@ -1,0 +1,30 @@
+---
+import Base from '../layouts/Base.astro';
+const email = 'zinnia_art@proton.me';
+---
+
+<Base title="Contact" description="Questions, feedback or suggestions for Loop Master.">
+  <section class="page wrap contact">
+    <p class="label">Get in touch</p>
+    <h1 class="title">Contact Us</h1>
+    <p class="lede">Have questions, feedback, or suggestions? We'd love to hear from you! Contact us at:</p>
+    <a class="email" href={`mailto:${email}`}>{email}</a>
+  </section>
+  <div class="section"></div>
+</Base>
+
+<style>
+  .title { font-size: clamp(2.5rem, 7vw, 5rem); }
+  .lede { font-size: var(--step-1); }
+  .email {
+    display: inline-block;
+    margin-top: 8px;
+    font-family: var(--font-mono);
+    font-size: clamp(1.125rem, 3.5vw, 1.75rem);
+    color: var(--accent);
+    text-decoration: none;
+    border-bottom: 1px solid var(--accent);
+    word-break: break-all;
+  }
+  .email:hover { color: var(--line); border-color: var(--line); }
+</style>

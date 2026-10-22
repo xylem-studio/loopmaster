@@ -1,0 +1,45 @@
+# Build the Astro site and deploy it to GitHub Pages.
+# Based on https://docs.astro.build/en/guides/deploy/github/
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+        with:
+          # The Godot .wasm is stored in Git LFS; without this the site ships a pointer file.
+          lfs: true
+      - name: Verify game .wasm is not an LFS pointer
+        run: |
+          size=$(stat -c%s public/practice/web/v7/formmaster_session.wasm)
+          echo "formmaster_session.wasm: $size bytes"
+          test "$size" -gt 1000000
+      - name: Install, build, and upload site
+        uses: withastro/action@v6
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v5

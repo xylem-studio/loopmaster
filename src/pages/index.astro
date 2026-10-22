@@ -1,0 +1,51 @@
+---
+import Base from '../layouts/Base.astro';
+import Hero from '../components/Hero.astro';
+import TryLoop from '../components/TryLoop.astro';
+import Spread from '../components/Spread.astro';
+import Specimens from '../components/Specimens.astro';
+import XRay from '../components/XRay.astro';
+import sketchbook from '../assets/img/home-sketchbook.jpg';
+import tablet from '../assets/img/home-tablet-torus.jpg';
+---
+
+<Base>
+  <Hero />
+  <TryLoop />
+
+  <Spread
+    num="01"
+    side="left"
+    label="For every level"
+    title="Designed for artists of all levels"
+    ratio="1 / 1"
+    image={tablet}
+    alt="A tablet shows a glossy 3D torus while an artist draws it on paper with cross-contour loops"
+    caption="Fig. 01 — From screen to paper"
+    cta={{ href: '/practice/', text: 'Start Drawing' }}
+  >
+    <p>
+      This tool helps you practice constructing 3D shapes by drawing cross contour lines within a set time
+      limit.
+    </p>
+  </Spread>
+
+  <Specimens />
+
+  <Spread
+    num="03"
+    label="Generated forms"
+    title="New Shapes for Every Practice!"
+    image={sketchbook}
+    alt="An artist sketching simple forms wrapped in cross-contour lines, with one torus traced in orange"
+    caption="Fig. 03 — A new form, every session"
+    cta={{ href: '/practice/', text: 'Start Drawing' }}
+  >
+    <p>
+      Every time you practice, a new image of shapes is generated just for you from our exclusive 3D assets,
+      ensuring a unique experience that allows you to explore and refine your artistic skills.
+    </p>
+  </Spread>
+
+  <XRay />
+</Base>
