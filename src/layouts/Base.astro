@@ -24,6 +24,12 @@ const nav = [
 ];
 // Practice is the main action, so it lives at the end of the bar as a button.
 const practice = { href: '/practice/', label: 'Practice' };
+const footNav = [
+  practice,
+  { href: '/about/', label: 'About' },
+  { href: '/contact/', label: 'Contact' },
+  { href: '/terms/', label: 'Terms and Privacy Policy' },
+];
 const isCurrent = (href: string) => (href === '/' ? path === '/' : path === href.replace(/\/$/, ''));
 ---
 
@@ -83,10 +89,11 @@ const isCurrent = (href: string) => (href === '/' ? path === '/' : path === href
         <nav aria-label="Footer">
           <p class="label">Site</p>
           <ul>
-            <li><a class="foot-practice" href="/practice/">Practice</a></li>
-            <li><a href="/about/">About</a></li>
-            <li><a href="/contact/">Contact</a></li>
-            <li><a href="/terms/">Terms and Privacy Policy</a></li>
+            {footNav.map((item) => (
+              <li>
+                <a href={item.href} aria-current={isCurrent(item.href) ? 'page' : undefined}>{item.label}</a>
+              </li>
+            ))}
           </ul>
         </nav>
         <div>
@@ -192,7 +199,8 @@ const isCurrent = (href: string) => (href === '/' ? path === '/' : path === href
   .foot .foot-cta { margin-top: 24px; color: var(--ink); font-size: 0.875rem; }
   .foot .foot-cta:hover { color: var(--accent); }
   .foot-brand { display: flex; flex-direction: column; align-items: flex-start; }
-  .foot .foot-practice { color: var(--accent); }
+  /* Same rule as the top bar: orange means "you are here". */
+  .foot nav a[aria-current='page'] { color: var(--accent); }
   .foot-logo { display: inline-block; margin-bottom: 18px; }
   .foot-logo img { width: clamp(180px, 18vw, 220px); }
   .foot-bottom {
