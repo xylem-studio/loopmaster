@@ -22,9 +22,18 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v7
+      # The Godot .wasm is stored in Git LFS; without it the site ships a pointer file.
+      # Instead of `lfs: true` (which downloads it on every deploy and uses up the LFS
+      # bandwidth allowance), cache the LFS objects and only fetch them when they change.
+      - name: List LFS objects
+        run: git lfs ls-files --long | cut -d' ' -f1 | sort > .lfs-assets-id
+      - name: Restore LFS cache
+        uses: actions/cache@v6
         with:
-          # The Godot .wasm is stored in Git LFS; without this the site ships a pointer file.
-          lfs: true
+          path: .git/lfs
+          key: lfs-${{ hashFiles('.lfs-assets-id') }}
+      - name: Pull LFS files
+        run: git lfs pull
       - name: Verify game .wasm is not an LFS pointer
         run: |
           size=$(stat -c%s public/practice/web/v7/formmaster_session.wasm)
