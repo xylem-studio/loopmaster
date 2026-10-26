@@ -79,12 +79,8 @@ const { num, label, title, image, alt, caption, side = 'right', ratio = '4 / 5',
   }
   .spread--right .media { --fade: linear-gradient(to right, transparent 0%, #000 38%); }
   .spread--left .media { --fade: linear-gradient(to left, transparent 0%, #000 38%); }
-  figcaption {
-    position: absolute;
-    bottom: 0;
-    writing-mode: vertical-rl;
-    white-space: nowrap;
-  }
+  /* Caption sits under the image, on the edge that bleeds off the page. */
+  figcaption { padding-top: 12px; white-space: nowrap; }
 
   .copy {
     position: relative;
@@ -102,13 +98,13 @@ const { num, label, title, image, alt, caption, side = 'right', ratio = '4 / 5',
   /* Image bleeds off the right edge, copy on the left overlapping it. */
   .spread--right .num { left: var(--gutter); }
   .spread--right .media { grid-column: 8 / full-end; }
-  .spread--right figcaption { left: -28px; rotate: 180deg; }
+  .spread--right figcaption { padding-right: var(--gutter); text-align: right; }
   .spread--right .copy { grid-column: content-start / 11; }
 
   /* Mirror: image bleeds off the left edge. */
   .spread--left .num { right: var(--gutter); }
   .spread--left .media { grid-column: full-start / 7; }
-  .spread--left figcaption { position: static; writing-mode: horizontal-tb; padding: 12px var(--gutter) 0; }
+  .spread--left figcaption { padding-left: var(--gutter); }
   .spread--left .copy { grid-column: 6 / content-end; text-align: right; }
   .spread--left .body { margin-left: auto; }
 

@@ -153,8 +153,13 @@ const NO = 'M-7 -7L7 7M7 -7L-7 7';
   }
   .card h3 { margin: 4px 0 8px; }
   .card p { margin: 0; font-size: 0.9375rem; color: var(--muted); max-width: 60ch; }
-  @media (max-width: 560px) {
-    .card { grid-template-columns: minmax(0, 1fr); }
+  /* Diagram on top, text below: phones, and tablets (touch screens up to iPad Pro
+     landscape) where the cards sit two to a row again. */
+  @media (min-width: 561px) and (max-width: 1366px) and (hover: none) and (pointer: coarse) {
+    .cards { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  }
+  @media (max-width: 560px), (max-width: 1366px) and (hover: none) and (pointer: coarse) {
+    .card { grid-template-columns: minmax(0, 1fr); grid-template-rows: none; }
     .card svg { grid-row: auto; max-width: 220px; margin-bottom: 12px; }
     .card::before { grid-column: 1; grid-row: 2; }
   }
