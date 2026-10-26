@@ -22,7 +22,9 @@ const { num, label, title, image, alt, caption, side = 'right', ratio = '4 / 5',
 <section class:list={['spread', `spread--${side}`]}>
   <span class="num" aria-hidden="true">{num}</span>
   <figure class="media" style={`--ratio:${ratio}`}>
-    <Image src={image} alt={alt} widths={[480, 800, 1024]} sizes="(max-width: 860px) 100vw, 60vw" />
+    <div class="frame">
+      <Image src={image} alt={alt} widths={[480, 800, 1024]} sizes="(max-width: 860px) 100vw, 60vw" />
+    </div>
     <figcaption class="label">{caption}</figcaption>
   </figure>
   <div class="copy">
@@ -61,16 +63,19 @@ const { num, label, title, image, alt, caption, side = 'right', ratio = '4 / 5',
     margin: 0;
     grid-row: 1;
   }
+  /* Fade the edge that faces the text into the page, so photo and copy share one dark ground.
+     Two nested single-layer masks (frame: top/bottom, image: side) instead of one
+     mask-composite: older Safari (iPadOS 15) renders the composite fully transparent. */
+  .frame {
+    -webkit-mask-image: linear-gradient(to bottom, transparent 0%, #000 12%, #000 88%, transparent 100%);
+    mask-image: linear-gradient(to bottom, transparent 0%, #000 12%, #000 88%, transparent 100%);
+  }
   .media :global(img) {
     width: 100%;
     aspect-ratio: var(--ratio);
     object-fit: cover;
-    /* Fade the edge that faces the text into the page, so photo and copy share one dark ground. */
-    --fade-v: linear-gradient(to bottom, transparent 0%, #000 12%, #000 88%, transparent 100%);
-    -webkit-mask-image: var(--fade), var(--fade-v);
-    -webkit-mask-composite: source-in;
-    mask-image: var(--fade), var(--fade-v);
-    mask-composite: intersect;
+    -webkit-mask-image: var(--fade);
+    mask-image: var(--fade);
   }
   .spread--right .media { --fade: linear-gradient(to right, transparent 0%, #000 38%); }
   .spread--left .media { --fade: linear-gradient(to left, transparent 0%, #000 38%); }
@@ -118,6 +123,6 @@ const { num, label, title, image, alt, caption, side = 'right', ratio = '4 / 5',
     /* Stacked on phones: fade the bottom edge into the heading instead. */
     .spread--right .media,
     .spread--left .media { --fade: linear-gradient(to top, transparent 0%, #000 30%); }
-    .media :global(img) { --fade-v: linear-gradient(#000, #000); }
+    .frame { -webkit-mask-image: none; mask-image: none; }
   }
 </style>
