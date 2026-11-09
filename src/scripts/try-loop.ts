@@ -1,5 +1,5 @@
 // "Try it": draw one cross-contour loop around the middle of a cylinder,
-// then overlay the true loop (front half solid, hidden half dashed) and score it.
+// then overlay the true loop (front half orange, hidden half blue) and score it.
 
 type V3 = [number, number, number];
 type P2 = [number, number];
@@ -35,8 +35,8 @@ export function mountTryLoop(root: HTMLElement) {
   const canvas = root.querySelector('canvas')!;
   const result = root.querySelector<HTMLElement>('[data-result]')!;
   const ctx = canvas.getContext('2d')!;
-  // Shape in muted grey, your stroke bright, the answer in orange: three roles, three colours.
-  const colors = { bg: css('--ink-2'), shape: css('--muted'), pen: css('--line'), accent: css('--accent'), grid: 'rgb(232 239 233 / 0.05)' };
+  // Shape in muted grey, your stroke bright, the answer in orange, anything out of sight in blue.
+  const colors = { bg: css('--ink-2'), shape: css('--muted'), pen: css('--line'), accent: css('--accent'), hidden: css('--hidden'), grid: 'rgb(232 239 233 / 0.05)' };
 
   let shape = makeShape(0.42, -0.22);
   let stroke: P2[] = [];
@@ -55,7 +55,8 @@ export function mountTryLoop(root: HTMLElement) {
     return { p: project(p), front: n[2] > 0 };
   }
 
-  function ring(t: number, opts: { color: string; width: number; hiddenDash?: number[]; forceSolid?: boolean }) {
+  // Hidden half is drawn solid in the "hidden" blue, thinner and fainter, as in the app's feedback.
+  function ring(t: number, opts: { color: string; width: number; hiddenAlpha?: number; forceSolid?: boolean }) {
     const N = 120;
     for (const wantFront of [true, false]) {
       ctx.beginPath();
@@ -68,15 +69,14 @@ export function mountTryLoop(root: HTMLElement) {
           open = true;
         } else open = false;
       }
-      ctx.strokeStyle = opts.color;
-      ctx.lineWidth = opts.width;
-      ctx.globalAlpha = wantFront || opts.forceSolid ? 1 : 0.55;
-      ctx.setLineDash(wantFront || opts.forceSolid ? [] : opts.hiddenDash ?? [6, 6]);
+      const seen = wantFront || opts.forceSolid;
+      ctx.strokeStyle = seen ? opts.color : colors.hidden;
+      ctx.lineWidth = seen ? opts.width : opts.width * 0.75;
+      ctx.globalAlpha = seen ? 1 : opts.hiddenAlpha ?? 0.9;
       ctx.stroke();
       if (opts.forceSolid) break;
     }
     ctx.globalAlpha = 1;
-    ctx.setLineDash([]);
   }
 
   function line(a: P2, b: P2) {
@@ -102,7 +102,7 @@ export function mountTryLoop(root: HTMLElement) {
 
     // Cylinder: near cap fully visible, far cap half hidden, two silhouette lines.
     ring(H, { color: colors.shape, width: 2, forceSolid: true });
-    ring(-H, { color: colors.shape, width: 2, hiddenDash: [5, 7] });
+    ring(-H, { color: colors.shape, width: 2, hiddenAlpha: 0.45 });
     ctx.strokeStyle = colors.shape;
     ctx.lineWidth = 2;
     for (const th of [0, Math.PI]) line(rim(-H, th).p, rim(H, th).p);
@@ -117,7 +117,7 @@ export function mountTryLoop(root: HTMLElement) {
       line([p[0] + ux * 6, p[1] + uy * 6], [p[0] + ux * 18, p[1] + uy * 18]);
     }
 
-    if (revealed) ring(0, { color: colors.accent, width: 3.5, hiddenDash: [7, 7] });
+    if (revealed) ring(0, { color: colors.accent, width: 3.5 });
 
     if (stroke.length > 1) {
       ctx.strokeStyle = colors.pen;
@@ -179,7 +179,7 @@ export function mountTryLoop(root: HTMLElement) {
     revealed = true;
     render();
     if (stroke.length < 8) {
-      result.innerHTML = `Here's the true loop. The <strong>dashed half</strong> is the side you can't see — draw it anyway.`;
+      result.innerHTML = `Here's the true loop. The <strong class="hid">blue half</strong> is the side you can't see — draw it anyway.`;
       return;
     }
     const s = score();

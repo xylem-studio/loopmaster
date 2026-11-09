@@ -166,14 +166,14 @@ const NO = 'M-7 -7L7 7M7 -7L-7 7';
 
   svg path { fill: none; stroke-linecap: round; stroke-linejoin: round; }
   .shape path { stroke: var(--line); stroke-width: 1.6; }
-  .hidden-lines path { stroke: var(--line); stroke-width: 1.2; stroke-dasharray: 4 5; opacity: 0.35; }
+  .hidden-lines path { stroke: var(--hidden); stroke-width: 1.2; opacity: 0.45; }
 
   /* Visualize: the visible half is quiet, the hidden half is the point. */
   .seen { stroke: var(--muted); stroke-width: 1.6; }
-  .unseen { stroke: var(--accent); stroke-width: 2.2; stroke-dasharray: 5 5; }
+  .unseen { stroke: var(--hidden); stroke-width: 2.2; }
 
   .good { stroke: var(--accent); stroke-width: 2.4; }
-  .good.hid { stroke-width: 1.8; stroke-dasharray: 4 5; opacity: 0.7; }
+  .good.hid { stroke: var(--hidden); stroke-width: 1.8; opacity: 0.9; }
   .bad { stroke: var(--muted); stroke-width: 2.2; opacity: 0.8; }
 
   .mark { fill: none; stroke-width: 3.2; stroke-linecap: round; stroke-linejoin: round; }

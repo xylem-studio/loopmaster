@@ -11,7 +11,7 @@
         the middle of this cylinder, including the half that turns away from you. Then compare it with the real
         one.
       </p>
-      <p class="muted">Solid lines are the parts you can see. Dashed lines are hidden behind the form.</p>
+      <p class="muted">Grey and orange lines are the parts you can see. <span class="hid">Blue lines</span> are hidden behind the form.</p>
       <div class="actions">
         <button class="btn btn--ghost" type="button" data-action="clear">Clear</button>
         <button class="btn btn--ghost" type="button" data-action="new">New angle</button>
@@ -74,4 +74,6 @@
   figcaption :global(.stats) { flex-basis: 100%; }
   figcaption :global(.note) { flex-basis: 100%; color: var(--line); }
   figcaption :global(strong) { color: var(--accent); font-weight: 600; }
+  .hid,
+  figcaption :global(strong.hid) { color: var(--hidden); font-weight: 600; }
 </style>

@@ -8,6 +8,7 @@ import { generateCity, generateLoops, type CityBox, type CityLoop } from './city
 const INK = 0x000f07;
 const LINE = 0xe8efe9;
 const ACCENT = 0xff9933;
+const HIDDEN = 0x6f86ff; // matches --hidden: the far side of a form, as in the app's feedback
 const SPIN = 0.06; // rad / s
 
 // 8 corners -> 12 edges, as a flat LineSegments position array.
@@ -111,24 +112,22 @@ export function mountHeroCity(
   visible.renderOrder = 2;
   spin.add(hidden, visible);
 
-  // 3. Orange cross-contour loops, with the same visible / hidden split.
+  // 3. Cross-contour loops, with the same visible / hidden split: orange in front,
+  //    solid blue behind, like the app's feedback.
   const loopPos: number[] = [];
   generateLoops(boxes).forEach((l: CityLoop) => loopEdges(boxes[l.box], l.y, loopPos));
   const loops = new BufferGeometry();
   loops.setAttribute('position', new Float32BufferAttribute(loopPos, 3));
   const loopsHidden = new LineSegments(
     loops,
-    new LineDashedMaterial({
-      color: ACCENT,
-      dashSize: 0.06,
-      gapSize: 0.06,
+    new LineBasicMaterial({
+      color: HIDDEN,
       transparent: true,
-      opacity: 0.6,
+      opacity: 0.85,
       depthFunc: GreaterDepth,
       depthWrite: false,
     }),
   );
-  loopsHidden.computeLineDistances();
   loopsHidden.renderOrder = 1;
   const loopsVisible = new LineSegments(loops, new LineBasicMaterial({ color: ACCENT, depthFunc: LessEqualDepth }));
   loopsVisible.renderOrder = 3;
@@ -144,7 +143,8 @@ export function mountHeroCity(
   spin.add(grid);
 
   // 4. The "unseen zone": behind the headline every line switches to the faint
-  //    dashed hidden-line style, so the text sits on calm ground without a black box.
+  //    hidden-line style (dashed edges, blue loops), so the text sits on calm
+  //    ground without a black box.
   const zoneEdges = new LineDashedMaterial({
     color: LINE,
     dashSize: 0.07,
@@ -153,10 +153,8 @@ export function mountHeroCity(
     opacity: 0.22,
     depthFunc: LessEqualDepth,
   });
-  const zoneLoops = new LineDashedMaterial({
-    color: ACCENT,
-    dashSize: 0.06,
-    gapSize: 0.08,
+  const zoneLoops = new LineBasicMaterial({
+    color: HIDDEN,
     transparent: true,
     opacity: 0.4,
     depthFunc: LessEqualDepth,

@@ -139,7 +139,7 @@ const steps = [
   svg path { fill: none; stroke-linecap: round; stroke-linejoin: round; }
   .step { --ink-line: color-mix(in srgb, var(--accent) calc(var(--heat) * 45%), var(--line)); }
   .shape path { stroke: var(--ink-line); stroke-width: 1.6; }
-  .hidden-lines path { stroke: var(--ink-line); stroke-width: 1.2; stroke-dasharray: 4 5; opacity: 0.35; }
+  .hidden-lines path { stroke: var(--hidden); stroke-width: 1.2; opacity: 0.45; }
 
   /* Step 2: loops you only imagine — faint, breathing */
   .imagined path {
@@ -158,9 +158,8 @@ const steps = [
     animation: draw-loop 5s cubic-bezier(0.6, 0, 0.3, 1) infinite both paused;
   }
   .drawn .hid {
-    stroke: var(--accent);
+    stroke: var(--hidden);
     stroke-width: 1.6;
-    stroke-dasharray: 4 5;
     opacity: 0;
     animation: show-hidden 5s ease infinite both paused;
   }
@@ -178,13 +177,13 @@ const steps = [
   }
   @keyframes show-hidden {
     0%, 24% { opacity: 0; }
-    36%, 72% { opacity: 0.55; }
+    36%, 72% { opacity: 0.85; }
     86%, 100% { opacity: 0; }
   }
 
   @media (prefers-reduced-motion: reduce) {
     .imagined path { animation: none; opacity: 0.4; }
     .drawn .vis { animation: none; stroke-dashoffset: 0; }
-    .drawn .hid { animation: none; opacity: 0.55; }
+    .drawn .hid { animation: none; opacity: 0.85; }
   }
 </style>

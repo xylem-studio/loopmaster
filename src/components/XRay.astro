@@ -117,7 +117,7 @@ const sizes = '(max-width: 860px) 100vw, 560px';
   .lens svg { position: absolute; inset: 0; width: 100%; height: 100%; }
   /* Bold, confident strokes: a demo sketch, not a diagram. (viewBox units, ~0.37px each) */
   .lens path { fill: none; stroke: var(--accent); stroke-width: 7; stroke-linecap: round; stroke-linejoin: round; }
-  .lens path.hid { stroke-width: 5; stroke-dasharray: 16 18; opacity: 0.55; }
+  .lens path.hid { stroke: var(--hidden); stroke-width: 5; opacity: 0.8; }
   .lens path.gesture { stroke: var(--line); stroke-width: 5; opacity: 0.7; }
 
   .ring {

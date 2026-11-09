@@ -207,11 +207,11 @@ const offers = [
 
   svg path { fill: none; stroke-linecap: round; stroke-linejoin: round; }
   .shape path { stroke: var(--line); stroke-width: 1.6; }
-  .hidden-lines path { stroke: var(--line); stroke-width: 1.2; stroke-dasharray: 4 5; opacity: 0.35; }
+  .hidden-lines path { stroke: var(--hidden); stroke-width: 1.2; opacity: 0.45; }
 
   /* Feedback tile: a loop is drawn, then checked */
   .feedback .vis { stroke: var(--accent); stroke-width: 2.4; stroke-dasharray: 1; stroke-dashoffset: 1; animation: lm-draw 5s cubic-bezier(0.6, 0, 0.3, 1) infinite both paused; }
-  .feedback .hid { stroke: var(--accent); stroke-width: 1.6; stroke-dasharray: 4 5; opacity: 0; animation: lm-hidden 5s ease infinite both paused; }
+  .feedback .hid { stroke: var(--hidden); stroke-width: 1.6; opacity: 0; animation: lm-hidden 5s ease infinite both paused; }
   .feedback .badge { fill: var(--accent); opacity: 0; animation: tick-in 5s ease infinite both paused; }
   .feedback .tick { stroke: var(--ink); stroke-width: 3; opacity: 0; animation: tick-in 5s ease infinite both paused; }
   @keyframes tick-in {
@@ -223,7 +223,7 @@ const offers = [
   /* New shapes tile: cube → sphere → cone, crossfading */
   .morph .frame { opacity: 0; animation: morph 9s ease-in-out infinite both paused; animation-delay: calc(var(--n) * 3s); }
   .morph .loop-vis { stroke: var(--accent); stroke-width: 2; }
-  .morph .loop-hid { stroke: var(--accent); stroke-width: 1.4; stroke-dasharray: 4 5; opacity: 0.5; }
+  .morph .loop-hid { stroke: var(--hidden); stroke-width: 1.4; opacity: 0.8; }
   @keyframes morph {
     0% { opacity: 0; }
     8%, 30% { opacity: 1; }
@@ -303,7 +303,7 @@ const offers = [
 
   @media (prefers-reduced-motion: reduce) {
     .feedback .vis { animation: none; stroke-dashoffset: 0; }
-    .feedback .hid { animation: none; opacity: 0.55; }
+    .feedback .hid { animation: none; opacity: 0.85; }
     .feedback .badge, .feedback .tick { animation: none; opacity: 1; }
     .morph .frame { animation: none; }
     .morph .frame:first-child { opacity: 1; }

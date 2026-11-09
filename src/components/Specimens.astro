@@ -141,7 +141,7 @@ const specimens: { name: string; tip: string; form: FormDrawing }[] = [
 
   svg path { fill: none; stroke-linecap: round; stroke-linejoin: round; }
   .shape path { stroke: var(--line); stroke-width: 1.6; }
-  .hidden-lines path { stroke: var(--line); stroke-width: 1.2; stroke-dasharray: 4 5; opacity: 0.35; }
+  .hidden-lines path { stroke: var(--hidden); stroke-width: 1.2; opacity: 0.45; }
 
   /* Loops draw in, hold, erase and repeat while the card is on screen. */
   .loop .vis {
@@ -152,9 +152,8 @@ const specimens: { name: string; tip: string; form: FormDrawing }[] = [
     animation: draw-loop 6s cubic-bezier(0.6, 0, 0.3, 1) var(--d) infinite both paused;
   }
   .loop .hid {
-    stroke: var(--accent);
+    stroke: var(--hidden);
     stroke-width: 1.6;
-    stroke-dasharray: 4 5;
     opacity: 0;
     animation: show-hidden 6s ease var(--d) infinite both paused;
   }
@@ -168,12 +167,12 @@ const specimens: { name: string; tip: string; form: FormDrawing }[] = [
   }
   @keyframes show-hidden {
     0%, 22% { opacity: 0; }
-    34%, 70% { opacity: 0.55; }
+    34%, 70% { opacity: 0.85; }
     84%, 100% { opacity: 0; }
   }
 
   @media (prefers-reduced-motion: reduce) {
     .loop .vis { animation: none; stroke-dashoffset: 0; }
-    .loop .hid { animation: none; opacity: 0.55; }
+    .loop .hid { animation: none; opacity: 0.85; }
   }
 </style>

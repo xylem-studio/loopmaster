@@ -4,7 +4,7 @@ Loop Master – seeded wireframe city, rendered with Freestyle.
 Builds the same city as the live Three.js hero (src/scripts/city.ts: same
 mulberry32 PRNG, same seed, same call order) and renders a seamless rotation
 loop: visible edges as solid lines, hidden edges as faint dashed lines, plus
-orange cross-contour loops around some buildings (also visible / hidden).
+cross-contour loops around some buildings (orange in front, solid blue behind).
 
 Usage (Blender 4.x, from the repo root):
 
@@ -121,6 +121,7 @@ START_ROT = -0.6  # radians, same starting angle as the web hero
 INK = (0.0, 15 / 255, 7 / 255)
 LINE = (232 / 255, 239 / 255, 233 / 255)
 ACCENT = (1.0, 0x99 / 255, 0x33 / 255)
+HIDDEN = (0x6F / 255, 0x86 / 255, 1.0)  # --hidden on the site: the far side of a form
 
 # ----------------------------------------------------------------------------
 
@@ -350,7 +351,7 @@ def setup_freestyle(scene, city_coll, ground_coll, loops_coll):
     add_lineset(vl, "Hidden", city_coll, "HIDDEN", alpha=0.38, dashed=True)
     add_lineset(vl, "Visible", city_coll, "VISIBLE", alpha=1.0)
     add_lineset(vl, "Ground", ground_coll, "VISIBLE", alpha=0.08, edge_mark=True)
-    add_lineset(vl, "LoopsHidden", loops_coll, "HIDDEN", alpha=0.45, dashed=True, edge_mark=True, color=ACCENT)
+    add_lineset(vl, "LoopsHidden", loops_coll, "HIDDEN", alpha=0.85, edge_mark=True, thickness=0.75, color=HIDDEN)
     add_lineset(vl, "LoopsVisible", loops_coll, "VISIBLE", alpha=1.0, edge_mark=True, color=ACCENT)
 
 

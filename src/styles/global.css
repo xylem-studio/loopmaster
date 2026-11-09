@@ -12,6 +12,7 @@
   --line-dim: rgb(232 239 233 / 0.22);
   --muted: #9fb0a6;
   --accent: #ff9933;
+  --hidden: #6f86ff; /* lines on the far side of a form, as in the app's feedback */
   --paper: #faf5e5;
   --paper-ink: #0e0d06;
 
@@ -140,7 +141,7 @@ a:hover { color: var(--accent); }
 }
 @keyframes lm-hidden {
   0%, 24% { opacity: 0; }
-  36%, 72% { opacity: 0.55; }
+  36%, 72% { opacity: 0.85; }
   86%, 100% { opacity: 0; }
 }
 
