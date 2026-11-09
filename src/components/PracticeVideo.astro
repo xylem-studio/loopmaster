@@ -1,0 +1,193 @@
+---
+// A short, silent screen recording of one practice session, with the steps beside it.
+// Part of "How it works". The current step lights up (and shows its one-line detail)
+// as the video plays; clicking a step jumps to it.
+// Times are in seconds of the edited clip (public/media/practice-session.*). Each step lights once
+// per loop: the sped-up second and third shapes stay under "See every loop" instead of flickering.
+const steps = [
+  {
+    title: 'Set up',
+    text: 'Pick the shapes, the time and hints.',
+    ranges: [[0, 2.77]],
+  },
+  {
+    title: 'Draw',
+    text: 'Draw the loops before the timer ends.',
+    ranges: [[2.77, 5.87]],
+  },
+  {
+    title: 'See every loop',
+    text: 'Hidden loops show in blue.',
+    ranges: [[5.87, 12.1]],
+  },
+  {
+    title: 'Review',
+    text: 'Go back over every shape.',
+    ranges: [[12.1, 18]],
+  },
+];
+---
+
+<div class="pv" id="session">
+  <div class="grid">
+    <figure class="frame">
+      <video
+        muted
+        loop
+        playsinline
+        preload="none"
+        poster="/media/practice-session-poster.webp"
+        width="1920"
+        height="1080"
+        aria-label="Screen recording of a Loop Master session: choosing settings, drawing three shapes with hints, seeing the feedback, and reviewing the session"
+      >
+        <source src="/media/practice-session.webm" type="video/webm" />
+        <source src="/media/practice-session.mp4" type="video/mp4" />
+      </video>
+      <button class="toggle label" type="button" data-toggle aria-pressed="false">Play</button>
+      <figcaption class="label">Silent · parts sped up</figcaption>
+    </figure>
+
+    <ol class="steps">
+      {steps.map((s, i) => (
+        <li>
+          <button type="button" data-step={i} data-ranges={JSON.stringify(s.ranges)}>
+            <span class="label n">{String(i + 1).padStart(2, '0')}</span>
+            <span class="t">{s.title}</span>
+            <span class="d">{s.text}</span>
+          </button>
+        </li>
+      ))}
+    </ol>
+  </div>
+</div>
+
+<script>
+  const root = document.getElementById('session');
+  const video = root?.querySelector('video');
+  const toggle = root?.querySelector<HTMLButtonElement>('[data-toggle]');
+  if (root && video && toggle) {
+    const steps = [...root.querySelectorAll<HTMLButtonElement>('[data-step]')].map((el) => ({
+      el,
+      ranges: JSON.parse(el.dataset.ranges!) as [number, number][],
+    }));
+    const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+    let paused = reduce; // reduced motion: wait for the visitor to press play
+    let visible = false;
+
+    const sync = () => {
+      const t = video.currentTime;
+      steps.forEach(({ el, ranges }) =>
+        el.classList.toggle('is-on', ranges.some(([a, b]) => t >= a && t < b)),
+      );
+    };
+    const update = () => {
+      if (visible && !paused) {
+        video.play().catch(() => {});
+      } else video.pause();
+      toggle.textContent = paused ? 'Play' : 'Pause';
+      toggle.setAttribute('aria-pressed', String(!paused));
+    };
+
+    video.addEventListener('timeupdate', sync);
+    toggle.addEventListener('click', () => {
+      paused = !paused;
+      update();
+    });
+    steps.forEach(({ el, ranges }) =>
+      el.addEventListener('click', () => {
+        video.currentTime = ranges[0][0] + 0.01;
+        sync();
+        paused = false;
+        update();
+      }),
+    );
+
+    // Only load and play while the section is on screen.
+    new IntersectionObserver(
+      ([entry]) => {
+        visible = entry.isIntersecting;
+        if (visible && video.preload === 'none') video.preload = 'auto';
+        update();
+      },
+      { threshold: 0.35 },
+    ).observe(video);
+    sync();
+    update();
+  }
+</script>
+
+<style>
+  .grid {
+    display: grid;
+    grid-template-columns: minmax(0, 8fr) minmax(0, 4fr);
+    gap: clamp(24px, 4vw, 56px);
+    align-items: center;
+  }
+  @media (max-width: 860px) {
+    .grid { grid-template-columns: minmax(0, 1fr); }
+  }
+
+  .frame { position: relative; margin: 0; }
+  video {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 16 / 9;
+    border-radius: var(--radius);
+    background: #000;
+    box-shadow: 0 0 0 1px var(--accent);
+  }
+  .toggle {
+    position: absolute;
+    right: 12px;
+    bottom: 44px;
+    padding: 0.5em 0.9em;
+    color: var(--line);
+    background: rgb(0 15 7 / 0.75);
+    border: 1px solid var(--line-dim);
+    border-radius: var(--radius);
+    cursor: pointer;
+  }
+  .toggle:hover { border-color: var(--accent); color: var(--accent); }
+  figcaption { padding-top: 12px; color: var(--muted); }
+
+  .steps { list-style: none; margin: 0; padding: 0; display: grid; gap: 4px; }
+  .steps button {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    gap: 2px 14px;
+    width: 100%;
+    padding: 14px 16px;
+    text-align: left;
+    font: inherit;
+    color: var(--muted);
+    background: transparent;
+    border: 0;
+    border-left: 2px solid var(--line-dim);
+    cursor: pointer;
+    transition: color 0.25s ease, border-color 0.25s ease, background 0.25s ease;
+  }
+  .steps button:hover { color: var(--line); }
+  .steps .n { grid-row: 1 / 3; padding-top: 0.2em; }
+  .steps .t { font-weight: 600; }
+  /* Only the active step shows its detail line. */
+  .steps .d {
+    font-size: 0.875rem;
+    color: var(--muted);
+    max-height: 0;
+    opacity: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease, opacity 0.3s ease;
+  }
+  .steps button:global(.is-on) {
+    color: var(--accent);
+    border-left-color: var(--accent);
+    background: linear-gradient(to right, rgb(255 153 51 / 0.08), transparent);
+  }
+  .steps button:global(.is-on) .d { max-height: 3em; opacity: 1; }
+
+  @media (max-width: 860px) {
+    .steps { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .steps .d { display: none; }
+  }
+</style>

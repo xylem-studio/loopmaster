@@ -14,16 +14,19 @@ interface Props {
   caption: string;
   side?: 'right' | 'left'; // where the image bleeds
   ratio?: string;
+  fade?: 'deep' | 'soft'; // soft: photos whose content reaches the edge facing the copy
+  position?: string; // object-position of the cropped image
+  wide?: boolean; // image reaches one column further under the copy
   cta?: { href: string; text: string };
 }
-const { num, label, title, image, alt, caption, side = 'right', ratio = '4 / 5', cta } = Astro.props;
+const { num, label, title, image, alt, caption, side = 'right', ratio = '4 / 5', fade = 'deep', position = '50% 50%', wide = false, cta } = Astro.props;
 ---
 
-<section class:list={['spread', `spread--${side}`]}>
+<section class:list={['spread', `spread--${side}`, `spread--${fade}`, { 'spread--wide': wide }]}>
   <span class="num" aria-hidden="true">{num}</span>
-  <figure class="media" style={`--ratio:${ratio}`}>
+  <figure class="media" style={`--ratio:${ratio};--pos:${position}`}>
     <div class="frame">
-      <Image src={image} alt={alt} widths={[480, 800, 1024]} sizes="(max-width: 860px) 100vw, 60vw" />
+      <Image src={image} alt={alt} widths={[480, 800, 1024, 1600]} sizes="(max-width: 860px) 100vw, 60vw" />
     </div>
     <figcaption class="label">{caption}</figcaption>
   </figure>
@@ -74,11 +77,14 @@ const { num, label, title, image, alt, caption, side = 'right', ratio = '4 / 5',
     width: 100%;
     aspect-ratio: var(--ratio);
     object-fit: cover;
+    object-position: var(--pos);
     -webkit-mask-image: var(--fade);
     mask-image: var(--fade);
   }
   .spread--right .media { --fade: linear-gradient(to right, transparent 0%, #000 38%); }
   .spread--left .media { --fade: linear-gradient(to left, transparent 0%, #000 38%); }
+  .spread--soft.spread--right .media { --fade: linear-gradient(to right, transparent 0%, #000 14%); }
+  .spread--soft.spread--left .media { --fade: linear-gradient(to left, transparent 0%, #000 14%); }
   /* Caption sits under the image, on the edge that bleeds off the page. */
   figcaption { padding-top: 12px; white-space: nowrap; }
 
@@ -100,10 +106,14 @@ const { num, label, title, image, alt, caption, side = 'right', ratio = '4 / 5',
   .spread--right .media { grid-column: 8 / full-end; }
   .spread--right figcaption { padding-right: var(--gutter); text-align: right; }
   .spread--right .copy { grid-column: content-start / 11; }
+  /* Photos: keep the heading off the screens, overlapping one column like the mirrored layout. */
+  .spread--soft.spread--right .copy { grid-column: content-start / 9; }
+  .spread--wide.spread--right .media { grid-column: 7 / full-end; }
 
   /* Mirror: image bleeds off the left edge. */
   .spread--left .num { right: var(--gutter); }
   .spread--left .media { grid-column: full-start / 7; }
+  .spread--wide.spread--left .media { grid-column: full-start / 8; }
   .spread--left figcaption { padding-left: var(--gutter); }
   .spread--left .copy { grid-column: 6 / content-end; text-align: right; }
   .spread--left .body { margin-left: auto; }
@@ -111,14 +121,19 @@ const { num, label, title, image, alt, caption, side = 'right', ratio = '4 / 5',
   @media (max-width: 860px) {
     .spread { align-items: start; }
     .spread--right .media,
-    .spread--left .media { grid-column: full-start / full-end; margin-top: clamp(64px, 18vw, 120px); }
+    .spread--left .media,
+    .spread--wide.spread--right .media,
+    .spread--wide.spread--left .media { grid-column: full-start / full-end; margin-top: clamp(64px, 18vw, 120px); }
     .spread--right .copy,
-    .spread--left .copy { grid-column: content-start / content-end; grid-row: 2; margin-top: 20px; text-align: left; }
+    .spread--left .copy,
+    .spread--soft.spread--right .copy { grid-column: content-start / content-end; grid-row: 2; margin-top: 20px; text-align: left; }
     .spread--left .body { margin-left: 0; }
     figcaption { display: none; }
     /* Stacked on phones: fade the bottom edge into the heading instead. */
     .spread--right .media,
-    .spread--left .media { --fade: linear-gradient(to top, transparent 0%, #000 30%); }
+    .spread--left .media,
+    .spread--soft.spread--right .media,
+    .spread--soft.spread--left .media { --fade: linear-gradient(to top, transparent 0%, #000 30%); }
     .frame { -webkit-mask-image: none; mask-image: none; }
   }
 </style>

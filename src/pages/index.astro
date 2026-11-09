@@ -2,32 +2,34 @@
 import Base from '../layouts/Base.astro';
 import Hero from '../components/Hero.astro';
 import TryLoop from '../components/TryLoop.astro';
+import HowItWorks from '../components/HowItWorks.astro';
 import Spread from '../components/Spread.astro';
 import Specimens from '../components/Specimens.astro';
 import XRay from '../components/XRay.astro';
-import sketchbook from '../assets/img/home-sketchbook.jpg';
-import tablet from '../assets/img/home-tablet-torus.jpg';
+import sceneDrawing from '../assets/img/home-scene-drawing2.jpg';
+import sceneMonitors from '../assets/img/home-scene-monitors.jpg';
 ---
 
 <Base>
   <Hero />
   <TryLoop />
+  <HowItWorks />
 
   <Spread
     num="01"
     side="left"
     label="For every level"
     title="Designed for artists of all levels"
-    ratio="1 / 1"
-    image={tablet}
-    alt="A tablet shows a glossy 3D torus while an artist draws it on paper with cross-contour loops"
+    ratio="3 / 2"
+    fade="soft"
+    position="50% 50%"
+    wide
+    image={sceneDrawing}
+    alt="An artist draws an egg in a sketchbook while a laptop running Loop Master shows the same egg with orange hint loops"
     caption="Fig. 01 — From screen to paper"
     cta={{ href: '/practice/', text: 'Start Drawing' }}
   >
-    <p>
-      This tool helps you practice constructing 3D shapes by drawing cross contour lines within a set time
-      limit.
-    </p>
+    <p>Practice building 3D forms with cross-contour loops, against the clock.</p>
   </Spread>
 
   <Specimens />
@@ -36,15 +38,15 @@ import tablet from '../assets/img/home-tablet-torus.jpg';
     num="03"
     label="Generated forms"
     title="New Shapes for Every Practice!"
-    image={sketchbook}
-    alt="An artist sketching simple forms wrapped in cross-contour lines, with one torus traced in orange"
+    ratio="3 / 2"
+    fade="soft"
+    position="30% 50%"
+    image={sceneMonitors}
+    alt="A desk with two monitors: Loop Master showing a cube with its cross-contour feedback, and a drawing app with the same cube sketched by hand"
     caption="Fig. 03 — A new form, every session"
     cta={{ href: '/practice/', text: 'Start Drawing' }}
   >
-    <p>
-      Every time you practice, a new image of shapes is generated just for you from our exclusive 3D assets,
-      ensuring a unique experience that allows you to explore and refine your artistic skills.
-    </p>
+    <p>Every session brings new shapes, so you never draw the same view twice.</p>
   </Spread>
 
   <XRay />

@@ -1,0 +1,161 @@
+---
+// "How it works": the session video with its steps, then the "Hints on / Hints off"
+// panels: what you see while drawing, next to the feedback.
+// The two shots aren't framed the same, so they sit side by side rather than in an
+// overlay slider. Each mode has its own shapes (the screenshots came from different sessions).
+import { Image } from 'astro:assets';
+import PracticeVideo from './PracticeVideo.astro';
+import eggHint from '../assets/img/loops-egg-hint.png';
+import eggFeedback from '../assets/img/loops-egg-feedback.png';
+import wormHint from '../assets/img/loops-worm-hint.png';
+import wormFeedback from '../assets/img/loops-worm-feedback.png';
+import cubeBare from '../assets/img/loops-cube-bare.png';
+import cubeFeedback from '../assets/img/loops-cube-feedback.png';
+import egg2Bare from '../assets/img/loops-egg2-bare.png';
+import egg2Feedback from '../assets/img/loops-egg2-feedback.png';
+import ringsBare from '../assets/img/loops-rings-bare.png';
+import ringsFeedback from '../assets/img/loops-rings-feedback.png';
+
+const modes = [
+  {
+    id: 'on',
+    name: 'Hints on',
+    step: 'Hints: front loops only',
+    alt: 'with hint loops drawn only on the visible side',
+    shapes: [
+      { id: 'egg', name: 'Egg', draw: eggHint, feedback: eggFeedback },
+      { id: 'coil', name: 'Coil', draw: wormHint, feedback: wormFeedback },
+    ],
+  },
+  {
+    id: 'off',
+    name: 'Hints off',
+    step: 'No hints: just the bare form',
+    alt: 'with no lines, as you see it when hints are off',
+    shapes: [
+      { id: 'cube', name: 'Cube', draw: cubeBare, feedback: cubeFeedback },
+      { id: 'egg', name: 'Egg', draw: egg2Bare, feedback: egg2Feedback },
+      { id: 'rings', name: 'Rings', draw: ringsBare, feedback: ringsFeedback },
+    ],
+  },
+];
+const sizes = '(max-width: 640px) 100vw, (max-width: 1200px) 45vw, 560px';
+const img = { widths: [800, 1200, 1400], sizes, quality: 88 };
+---
+
+<section class="section hf" id="hints" aria-labelledby="hf-title">
+  <div class="wrap">
+    <header class="head">
+      <div>
+        <p class="label">How it works</p>
+        <h2 id="hf-title">Guess the loops. <span>Then see them all.</span></h2>
+      </div>
+      <p>Draw with or without hints. When time's up, see every loop.</p>
+    </header>
+
+    <PracticeVideo />
+
+    <div class="controls">
+      <div class="switch switch--mode" role="group" aria-label="Hints">
+        {modes.map((m, i) => (
+          <button class="btn btn--ghost" type="button" data-mode={m.id} aria-pressed={i === 0 ? 'true' : 'false'}>
+            {m.name}
+          </button>
+        ))}
+      </div>
+      {modes.map((m, i) => (
+        <div class="switch switch--shape" role="group" aria-label="Choose a shape" data-shapes={m.id} hidden={i !== 0}>
+          {m.shapes.map((s, j) => (
+            <button class="btn btn--ghost" type="button" data-shape={s.id} aria-pressed={j === 0 ? 'true' : 'false'}>
+              {s.name}
+            </button>
+          ))}
+        </div>
+      ))}
+    </div>
+
+    {modes.map((m, i) =>
+      m.shapes.map((s, j) => (
+        <div class="pair" data-pair={`${m.id}-${s.id}`} hidden={i !== 0 || j !== 0}>
+          <figure>
+            <Image src={s.draw} alt={`${s.name} ${m.alt}`} {...img} />
+            <figcaption><span class="label">01 · While you draw</span> {m.step}</figcaption>
+          </figure>
+          <figure>
+            <Image src={s.feedback} alt={`${s.name} with every loop shown, hidden loops in blue`} {...img} />
+            <figcaption><span class="label">02 · Feedback</span> Every loop, hidden ones in <b class="blue">blue</b></figcaption>
+          </figure>
+        </div>
+      ))
+    )}
+  </div>
+</section>
+
+<script>
+  const root = document.getElementById('hints');
+  if (root) {
+    const press = (group: Element, btn: HTMLElement) =>
+      group.querySelectorAll('button').forEach((b) => b.setAttribute('aria-pressed', String(b === btn)));
+    const show = () => {
+      const mode = root.querySelector<HTMLElement>('[data-mode][aria-pressed="true"]')?.dataset.mode;
+      const shapes = root.querySelector<HTMLElement>(`[data-shapes="${mode}"]`);
+      const shape = shapes?.querySelector<HTMLElement>('[aria-pressed="true"]')?.dataset.shape;
+      root.querySelectorAll<HTMLElement>('[data-shapes]').forEach((g) => (g.hidden = g !== shapes));
+      root.querySelectorAll<HTMLElement>('[data-pair]').forEach((p) => (p.hidden = p.dataset.pair !== `${mode}-${shape}`));
+    };
+    root.querySelectorAll<HTMLButtonElement>('.switch button').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        press(btn.parentElement!, btn);
+        show();
+      });
+    });
+  }
+</script>
+
+<style>
+  .hf { border-top: 1px solid var(--line-dim); }
+  .head {
+    display: grid;
+    grid-template-columns: minmax(0, 6fr) minmax(0, 5fr);
+    gap: 16px clamp(32px, 5vw, 72px);
+    align-items: end;
+    margin-bottom: 32px;
+  }
+  h2 span { color: var(--accent); }
+  .head p:last-child { color: var(--muted); }
+
+  .controls { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 24px; margin: clamp(56px, 8vw, 96px) 0 20px; }
+  .switch { display: flex; flex-wrap: wrap; gap: 10px; }
+  .switch[hidden] { display: none; }
+  .switch .btn { font-size: 0.75rem; padding: 0.7em 1.1em; }
+  .switch [aria-pressed='true'] { border-color: var(--accent); color: var(--accent); }
+  .switch--mode [aria-pressed='true'] { background: var(--accent); color: var(--ink); }
+  .switch--shape { padding-left: 24px; border-left: 1px solid var(--line-dim); }
+
+  .pair {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: clamp(12px, 2vw, 24px);
+  }
+  .pair[hidden] { display: none; }
+  figure { margin: 0; }
+  figure :global(img) {
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    border-radius: var(--radius);
+    box-shadow: 0 0 0 1px var(--line-dim);
+    background: #000;
+  }
+  figure:last-child :global(img) { box-shadow: 0 0 0 1px var(--accent); }
+  figcaption { padding-top: 12px; color: var(--muted); }
+  figcaption .label { display: block; color: var(--line); margin-bottom: 2px; }
+  .blue { color: var(--hidden); font-weight: 600; }
+
+  @media (max-width: 860px) {
+    .head { grid-template-columns: minmax(0, 1fr); }
+  }
+  @media (max-width: 560px) {
+    .pair { grid-template-columns: minmax(0, 1fr); }
+    .switch--shape { padding-left: 0; border-left: 0; }
+  }
+</style>
